@@ -1,0 +1,5 @@
+node_modules/
+*.log
+captured-exfil.log
+build-output/
+ATTACKER-WAS-HERE.marker
