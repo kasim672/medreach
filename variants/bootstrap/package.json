@@ -1,0 +1,18 @@
+{
+  "name": "medreach-bootstrap-variant",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MedReach frontend — Bootstrap 5 variant. Reference implementation. Tailwind and Skeleton variants are style-swaps against the same component contracts, so the CSS framework is the only independent variable (per MedReach_Corrected_Plan.md §6).",
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "14.2.15",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "bootstrap": "5.3.3"
+  }
+}
