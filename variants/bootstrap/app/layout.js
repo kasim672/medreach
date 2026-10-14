@@ -7,6 +7,7 @@ import SystemBanner from "../components/SystemBanner";
 import SosButton from "../components/SosButton";
 import HealthcareAssistant from "../components/HealthcareAssistant";
 import AccountChrome from "../components/AccountChrome";
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata = {
   title: "MedReach — Emergency care, when every second matters",
@@ -44,6 +45,7 @@ export default function RootLayout({ children }) {
           </div>
         </footer>
         <FooterWordmarkReveal />
+        <Analytics />
       </body>
     </html>
   );
