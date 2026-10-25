@@ -12,6 +12,7 @@
     "lint": "eslint app components lib _core"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "@vis.gl/react-google-maps": "^1.10.0",
     "bootstrap": "5.3.3",
     "next": "^15.5.28",
