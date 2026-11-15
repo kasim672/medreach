@@ -1,0 +1,4 @@
+# Replace with the actual API hostname before installation.
+api.example.com {
+    reverse_proxy 127.0.0.1:4000
+}

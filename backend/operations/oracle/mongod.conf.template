@@ -1,0 +1,15 @@
+# Merge into the packaged MongoDB configuration on the NEW Oracle host.
+storage:
+  dbPath: /var/lib/mongodb
+systemLog:
+  destination: file
+  logAppend: true
+  path: /var/log/mongodb/mongod.log
+net:
+  port: 27017
+  bindIp: 127.0.0.1
+replication:
+  replSetName: medreach-rs
+security:
+  authorization: enabled
+  keyFile: /etc/mongodb/replica.key
