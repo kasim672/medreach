@@ -1,4 +1,5 @@
 "use client";
+import DiagnosticRequests from "./DiagnosticRequests";
 import Link from "next/link";
 import { useAdminResource, adminList } from "@medreach/core";
 import AdminDataState from "./AdminDataState";
@@ -16,6 +17,7 @@ export default function ServiceRequestHistory({ enabled = true }) {
 
   return (
     <>
+      <DiagnosticRequests enabled={enabled} />
       <section className="bg-white rounded-lg border border-[var(--color-border)] shadow-sm p-5 mb-4">
         <h2 className="text-lg font-bold mb-3">Blood requests and donation pledges</h2>
         <AdminDataState resource={blood} label="blood request history" emptyMessage="No blood requests or donation pledges recorded.">

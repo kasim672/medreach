@@ -1,7 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test("Bootstrap sign-in has password only and one registration link preserving its destination", async ({ page }, info) => {
-  test.skip(info.project.name !== "bootstrap", "Bootstrap login cleanup only");
+test("sign-in has password only and one registration link preserving its destination", async ({ page }) => {
   await page.route("**/api/auth/me", route => route.fulfill({ json: { user: null } }));
   await page.goto("/login?returnTo=%2Fcareers");
   const main = page.locator("#main");

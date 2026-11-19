@@ -16,7 +16,7 @@ const RIGHT = [
 ];
 
 export default function Navbar() {
-  const { user, isAdmin, logout } = useAuth();
+  const { user } = useAuth();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -54,14 +54,10 @@ export default function Navbar() {
       <div id="nav" className={`tw-nav-panel ${open ? "is-open" : ""}`}>
         <ul className="tw-nav-left">{LEFT.map(navLink)}</ul>
         <ul className="tw-nav-right">{RIGHT.map(navLink)}
-          {user ? <li><button type="button" className="tw-nav-logout" onClick={() => { setOpen(false); logout(); }}><EmergencyIcon name="user" size={20} /><span>Logout ({user.name.split(" ")[0]})</span></button></li>
+          {user ? <li><Link href="/dashboard" className="tw-nav-profile" onClick={() => setOpen(false)}><EmergencyIcon name="user" size={20} /><span>Profile</span></Link></li>
             : <li><Link href="/login" onClick={() => setOpen(false)} className={`tw-nav-login `}><EmergencyIcon name="user" size={20} /><span>Login</span></Link></li>}
         </ul>
-        {user && <ul className="tw-nav-account" aria-label="Your account">
-          {navLink(["/dashboard", "Dashboard", "document"])}{navLink(["/profile", "Profile", "user"])}
-          {["provider_admin", "hospital_admin"].includes(user.role) && navLink(["/provider", "Provider", "hospital"])}
-          {isAdmin && user.role === "system_admin" && navLink(["/admin", "Admin", "shield"])}
-        </ul>}
+
       </div>
     </div>
   </nav>;

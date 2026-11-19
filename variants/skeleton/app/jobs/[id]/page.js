@@ -1,5 +1,6 @@
 "use client";
 
+import CareerAvailability from "../../../components/CareerAvailability";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
@@ -133,6 +134,10 @@ export default function JobDetailPage() {
 
   const handleApply = async (e) => {
     e.preventDefault();
+    if (job?.availability?.acceptingApplications === false) {
+      setStatus("Applications are closed for this role. Refresh to check for updates.");
+      return;
+    }
     setStatus("");
 
     if (!candidateName.trim()) {
@@ -269,6 +274,7 @@ export default function JobDetailPage() {
             <article className="surface h-100">
               <span className="eyebrow">{job.category}</span>
               <h1 className="h3 mt-1 mb-2">{job.title}</h1>
+              <CareerAvailability job={job} />
               <p className="text-secondary mb-3">
                 <strong>{orgName}</strong> · {orgLocation}
               </p>
@@ -406,6 +412,12 @@ export default function JobDetailPage() {
               /* PROPER APPLICATION FORM */
               <form className="surface sticky-top" style={{ top: "1.5rem" }} onSubmit={handleApply} noValidate>
                 <h2 className="h5 mb-3">Apply for this Position</h2>
+                {job.availability?.acceptingApplications === false && (
+                  <p className="parity-message parity-message-warning" role="status">
+                    Applications are closed for this role.{" "}
+                    <button type="button" className="parity-action parity-action-outline" onClick={() => setJobRevision((value) => value + 1)}>Refresh role</button>
+                  </p>
+                )}
 
                 {user && (
                   <div className="alert alert-info py-2 px-3 small mb-3">
@@ -651,7 +663,7 @@ export default function JobDetailPage() {
                 <button
                   type="submit"
                   className="btn btn-primary w-100 py-2 fw-bold"
-                  disabled={submitting}
+                  disabled={submitting || job.availability?.acceptingApplications === false}
                   aria-busy={submitting}
                 >
                   {submitting ? "Submitting Application…" : "Submit Application"}

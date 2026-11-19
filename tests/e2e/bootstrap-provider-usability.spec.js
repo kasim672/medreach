@@ -19,7 +19,6 @@ async function fixtures(page, role = "provider_admin") {
   });
   return state;
 }
-test.beforeEach(({}, info) => test.skip(info.project.name !== "bootstrap", "Bootstrap provider UI only"));
 
 test("workspace shows only the selected service requests and saves that organisation's contact details", async ({ page }, info) => {
   const state = await fixtures(page);

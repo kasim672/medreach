@@ -1,0 +1,104 @@
+"use client";
+import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
+import { productApi, patch } from "../lib/productApi";
+import { diagnosticTestLabel, diagnosticStatusLabel, diagnosticAppointment } from "../lib/diagnostics";
+import CapacityNotice from "./CapacityNotice";
+
+function DiagnosticReview({ row, reload }) {
+  const [accepted, setAccepted] = useState(row.tests);
+  const [appointment, setAppointment] = useState("");
+  const [response, setResponse] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const open = ["REQUESTED", "UNDER_REVIEW"].includes(row.status);
+  const capacityHeld = row.capacityAllocation?.mode === "held";
+  async function update(status) {
+    if (busy) return;
+    if (status === "CONFIRMED" && (!accepted.length || !appointment)) { setError("Select the tests you can provide and an appointment time."); return; }
+    setBusy(true); setError("");
+    try {
+      await patch(`/api/diagnostics/requests/${row._id}/status`, { expectedVersion: row.version, status, providerResponse: response.trim(),
+        ...(status === "CONFIRMED" ? { acceptedTests: accepted, appointmentAt: new Date(`${appointment}:00+05:30`).toISOString() } : {}) });
+      await reload();
+    } catch (error) { setError(error.message || "Unable to update this request. Refresh and try again."); }
+    finally { setBusy(false); }
+  }
+  return <div className="parity-pt-3 parity-mt-3 parity-border-top">
+    {error && <p className="parity-message parity-message-error" role="alert">{error}</p>}
+    {(open || row.status === "CONFIRMED") && <>
+      <label className="parity-field-label" htmlFor={`diagnostic-response-${row._id}`}>Message to patient</label>
+      <textarea id={`diagnostic-response-${row._id}`} className="parity-field parity-mb-3" value={response} maxLength={500} disabled={busy} onChange={event => setResponse(event.target.value)} placeholder="Confirm charges, preparation instructions or a reason for declining" />
+    </>}
+    {open && row.centreApprovalPending && <div className="parity-message parity-message-info">
+      <p>MedReach review: approve and onboard this centre before handing over the request. An appointment cannot be confirmed yet.</p>
+      <div className="parity-flex parity-wrap parity-gap-2"><Link className="parity-action parity-action-outline-primary" href="/admin/provider-accounts">Review centre approval</Link>
+        <button type="button" disabled={busy} className="parity-action parity-action-primary" onClick={() => update("UNDER_REVIEW")}>{row.status === "REQUESTED" ? "Review request" : "Send to centre after approval"}</button>
+        <button type="button" disabled={busy} className="parity-action parity-action-outline-danger" onClick={() => update("DECLINED")}>Decline request</button></div>
+    </div>}
+    {open && !row.centreApprovalPending && <form onSubmit={event => { event.preventDefault(); update("CONFIRMED"); }}>
+      <fieldset disabled={busy}>
+        <legend className="parity-heading-6">Tests you can provide</legend>
+        <div className="parity-flex parity-wrap parity-gap-3 parity-mb-3">{row.tests.map(test => <label key={test} className="parity-flex parity-center-items parity-gap-2"><input type="checkbox" className="parity-check-input parity-m-0" checked={accepted.includes(test)} disabled={capacityHeld} onChange={event => setAccepted(previous => event.target.checked ? [...previous, test] : previous.filter(value => value !== test))} />{diagnosticTestLabel(test)}</label>)}</div>
+        <label className="parity-field-label" htmlFor={`diagnostic-appointment-${row._id}`}>Appointment date and time (India time)</label>
+        <input id={`diagnostic-appointment-${row._id}`} type="datetime-local" className="parity-field parity-mb-3" value={appointment} min={capacityHeld ? `${row.preferredDate}T00:00` : undefined} max={capacityHeld ? `${row.preferredDate}T23:59` : undefined} onChange={event => setAppointment(event.target.value)} required />
+        <p className="parity-muted">{capacityHeld ? "This request holds all selected tests for its preferred date. Confirm every requested test on that date before the hold expires, or decline to release the capacity." : "Confirm only tests this centre can provide. Other requested tests will be shown as unavailable."}</p>
+        <div className="parity-flex parity-wrap parity-gap-2">
+          <button type="submit" className="parity-action parity-action-primary">Confirm appointment</button>
+          {row.status === "REQUESTED" && <button type="button" className="parity-action parity-action-outline" onClick={() => update("UNDER_REVIEW")}>Mark under review</button>}
+          <button type="button" className="parity-action parity-action-outline-danger" onClick={() => update("DECLINED")}>Decline request</button>
+        </div>
+      </fieldset>
+    </form>}
+    {row.status === "CONFIRMED" && <div className="parity-flex parity-wrap parity-gap-2"><button type="button" disabled={busy} className="parity-action parity-action-primary" onClick={() => update("COMPLETED")}>Mark completed</button><button type="button" disabled={busy} className="parity-action parity-action-outline-danger" onClick={() => update("CANCELLED")}>Cancel appointment</button></div>}
+  </div>;
+}
+
+export default function DiagnosticRequests({ providerId, manage = false, enabled = true }) {
+  const [rows, setRows] = useState([]);
+  const [nextCursor, setNextCursor] = useState(null);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [followup, setFollowup] = useState(false);
+  const load = useCallback(async (cursor, signal) => {
+    if (!enabled) return;
+    setBusy(true); setError("");
+    try {
+      const query = new URLSearchParams({ limit: "20", ...(providerId ? { providerId } : {}), ...(followup ? { followup: "true" } : {}), ...(cursor ? { before: cursor } : {}) });
+      const result = await productApi(`/api/diagnostics/requests?${query}`, { signal });
+      if (signal?.aborted) return;
+      setRows(previous => cursor ? [...previous, ...result.data] : result.data);
+      setNextCursor(result.nextCursor);
+    } catch (error) { if (!signal?.aborted) setError(error.message); }
+    finally { if (!signal?.aborted) setBusy(false); }
+  }, [enabled, providerId, followup]);
+  useEffect(() => {
+    const controller = new AbortController();
+    setRows([]); setNextCursor(null);
+    load(null, controller.signal);
+    return () => controller.abort();
+  }, [load]);
+  if (!enabled) return null;
+  return <section className="surface parity-mb-4" aria-labelledby="diagnostic-requests-heading">
+    <div className="parity-flex parity-wrap parity-center-items parity-between parity-gap-3 parity-mb-3"><h2 id="diagnostic-requests-heading" className="parity-heading-4 parity-mb-0">Diagnostic test requests</h2><button type="button" className="parity-action parity-action-outline parity-action-small" disabled={busy} onClick={() => load()}>Refresh requests</button></div>
+    {manage && !providerId && <label className="parity-flex parity-center-items parity-gap-2 parity-mb-3"><input type="checkbox" checked={followup} onChange={event => setFollowup(event.target.checked)} />Show requests needing centre approval or contact follow-up</label>}
+    {busy && <p role="status">Loading diagnostic requests…</p>}
+    {error && <p className="parity-message parity-message-error" role="alert">{error}</p>}
+    {!busy && !error && !rows.length && <p>No diagnostic test requests recorded.</p>}
+    <div className="parity-stack parity-gap-3">{rows.map(row => <article key={`${row._id}:${row.version}`} className="parity-border parity-rounded parity-p-3 parity-p-md-4">
+      <div className="parity-flex parity-wrap parity-between parity-gap-2 parity-mb-2"><h3 className="parity-heading-5 parity-mb-0">{row.providerName}</h3><span className="status-pill tone-info">{diagnosticStatusLabel(row.status)}</span></div>
+      <p className="parity-muted">{row.reference}</p>
+      <p>{row.tests.map(diagnosticTestLabel).join(" · ")}</p>
+      <p><strong>Priority:</strong> {row.urgency === "URGENT" ? "Urgent / emergency review requested" : "Routine"}</p>
+      <CapacityNotice record={row} resource="test appointment" />
+      <p>Preferred visit: {row.preferredDate} · {row.preferredTime.toLowerCase()}</p>
+      {row.appointmentAt && <p><strong>Appointment:</strong> {diagnosticAppointment(row.appointmentAt)} IST<br /><strong>Accepted tests:</strong> {row.acceptedTests.map(diagnosticTestLabel).join(" · ")}</p>}
+      {row.providerResponse && <p>Centre response: {row.providerResponse}</p>}
+      {manage && <><p>{row.requestSnapshot.patientName} · <a href={`tel:${row.requestSnapshot.contactPhone}`}>{row.requestSnapshot.contactPhone}</a></p>{row.requestSnapshot.notes && <p style={{ whiteSpace: "pre-wrap" }}>{row.requestSnapshot.notes}</p>}
+        {!row.centreApprovalPending && row.notificationRouting === "no_eligible_recipients" && <p className="parity-message parity-message-warning">No eligible notification contact. Assign an active Diagnostic Centre Admin and verify their notification email; contact the patient directly to coordinate this request.</p>}
+        <DiagnosticReview row={row} reload={() => load()} /></>}
+      {!manage && <Link className="parity-action parity-action-outline-primary" href={`/track?type=diagnostic&reference=${row.reference}`}>Track request</Link>}
+    </article>)}</div>
+    {nextCursor && <button type="button" disabled={busy} className="parity-action parity-action-outline-primary parity-mt-3" onClick={() => load(nextCursor)}>Load more requests</button>}
+  </section>;
+}

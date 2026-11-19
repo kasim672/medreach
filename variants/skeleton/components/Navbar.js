@@ -22,7 +22,7 @@ const RIGHT_LINKS = [
 ];
 
 export default function Navbar() {
-  const { user, isAdmin, logout } = useAuth();
+  const { user } = useAuth();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -69,15 +69,10 @@ export default function Navbar() {
           <ul className="skeleton-nav-links skeleton-nav-left">{LEFT_LINKS.map(renderLink)}</ul>
           <ul className="skeleton-nav-links skeleton-nav-right">
             {RIGHT_LINKS.map(renderLink)}
-            {user ? <li><button className="nav-logout" type="button" onClick={() => { setOpen(false); logout(); }}><EmergencyIcon name="user" size={20} /><span>Logout ({user.name.split(" ")[0]})</span></button></li> :
+            {user ? <li><Link href="/dashboard" className="nav-profile" onClick={() => setOpen(false)}><EmergencyIcon name="user" size={20} /><span>Profile</span></Link></li> :
               <li><Link className={`nav-login`} href="/login" onClick={() => setOpen(false)}><EmergencyIcon name="user" size={20} /><span>Login</span></Link></li>}
           </ul>
-          {user && <ul className="skeleton-account-links" aria-label="Your account">
-            {renderLink({ href: "/dashboard", label: "Dashboard", icon: "document" })}
-            {renderLink({ href: "/profile", label: "Profile", icon: "user" })}
-            {["provider_admin", "hospital_admin"].includes(user.role) && renderLink({ href: "/provider", label: "Provider", icon: "hospital" })}
-            {isAdmin && user.role === "system_admin" && renderLink({ href: "/admin", label: "Admin", icon: "shield" })}
-          </ul>}
+
         </div>
       </div>
     </nav>

@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-test.beforeEach(async ({ page }, info) => { test.skip(Boolean(info.project.name) && info.project.name !== "bootstrap", "Bootstrap-specific provider UI"); page.on("pageerror", (error) => { throw error; }); });
+test.beforeEach(async ({ page }) => { page.on("pageerror", (error) => { throw error; }); });
 const provider = { _id: "111111111111111111111111", id: "111111111111111111111111", name: "Fixture Provider", email: "fixture@example.test", role: "provider_admin", accountStatus: "active", region: "Mumbai" };
 const org = { _id: "222222222222222222222222", name: "Fixture Hospital", kind: "hospital" };
 async function mock(page, handler = () => null) {
@@ -16,7 +16,7 @@ async function mock(page, handler = () => null) {
     return route.fulfill({ json });
   });
 }
-test("Bootstrap password sign-in clears failed credentials without a second-factor field", async ({ page }) => {
+test("password sign-in clears failed credentials without a second-factor field", async ({ page }) => {
   let submitted;
   await mock(page, async (path, request) => {
     if (path === "/api/auth/login") { submitted = request.postDataJSON(); return { status: 401, json: { error: "Invalid email or password" } }; }
@@ -31,7 +31,7 @@ test("Bootstrap password sign-in clears failed credentials without a second-fact
   await expect(page.getByLabel("Password", { exact: true })).toHaveValue("");
   expect(await page.evaluate(() => JSON.stringify(localStorage))).not.toContain("ControlledFixture");
 });
-test("Bootstrap profile keeps password and session controls without MFA enrollment", async ({ page }) => {
+test("profile keeps password and session controls without MFA enrollment", async ({ page }) => {
   let mfaReads = 0;
   await mock(page, path => { if (path.startsWith("/api/auth/mfa")) { mfaReads++; return { json: { enabled: false, required: false, eligible: false } }; } });
   await page.goto("/profile");
@@ -40,7 +40,7 @@ test("Bootstrap profile keeps password and session controls without MFA enrollme
   await expect(page.getByRole("heading", { name: "Active sessions", exact: true })).toBeVisible();
   expect(mfaReads).toBe(0);
 });
-test("Bootstrap inventory preserves unknowns and conflicted edits; CSV needs reviewed attestation", async ({ page }) => {
+test("inventory preserves unknowns and conflicted edits; CSV needs reviewed attestation", async ({ page }, info) => {
   let input, confirmation;
   const observedAt = new Date(Date.now() - 60000).toISOString();
   const stage = { id: "333333333333333333333333", digest: "fixture-digest", status: "preview", attempts: 0, expiresAt: new Date(Date.now() + 600000).toISOString(), rows: [{ resourceKey: "general_beds", input: { unit: "beds", capacity: 50, occupied: 10, blocked: 0, held: 0, observedAt, expectedVersion: 2 } }] };
@@ -69,5 +69,5 @@ test("Bootstrap inventory preserves unknowns and conflicted edits; CSV needs rev
   await confirm.click();
   await expect(page.getByRole("heading", { name: "Import preview · partial" })).toBeVisible();
   expect(confirmation).toEqual({ digest: "fixture-digest", attestProviderObserved: true });
-  for (const width of [390, 1440]) { await page.setViewportSize({ width, height: 900 }); expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1); await page.screenshot({ path: `/tmp/medreach-provider-inventory-${width}.png`, fullPage: true }); }
+  for (const width of [390, 1440]) { await page.setViewportSize({ width, height: 900 }); expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1); await page.screenshot({ path: info.outputPath(`provider-inventory-${width}.png`), fullPage: true }); }
 });

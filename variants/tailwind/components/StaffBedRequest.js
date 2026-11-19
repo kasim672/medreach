@@ -1,4 +1,5 @@
 "use client";
+import CapacityNotice from "./CapacityNotice";
 import Link from "next/link";
 import { useState } from "react";
 import { bedRequestLabel, BED_REQUEST_STAFF_ACTIONS, adminEntity } from "@medreach/core";
@@ -21,6 +22,7 @@ export default function StaffBedRequest({ request, refresh, action }) {
     if (result) setResponse("");
   };
   return <article className="bg-white rounded-lg border border-gray-200 p-5 mb-4" aria-label={request.requestId}>
+    <CapacityNotice record={request} resource="bed" />
     <h3 className="text-lg font-bold mt-5 mb-3">{request.requestId} · {request.hospital?.name}</h3>
     <p><strong>{request.isEmergency ? "Emergency bed request" : "Standard bed request"}</strong> · {bedRequestLabel(request.status)}</p>
     <p>{request.emergencyType} · {request.requiredFacility} · <a href={`tel:${request.contactPhone}`}>Call patient</a></p>

@@ -1,4 +1,5 @@
 import "./globals.css";
+import "../../shared/parity.css";
 import localFont from "next/font/local";
 import Image from "next/image";
 import Link from "next/link";
@@ -134,7 +135,7 @@ export default function RootLayout({ children }) {
             <span>Emergency hospital discovery · Mumbai · Tailwind variant</span>
             <span className="text-[.78rem] text-[var(--color-muted)]">Not an official emergency service. In danger, call 112.</span>
           </div>
-          <div className="tw-landing-footer-links">
+          <div className="mx-auto w-full max-w-[1140px] px-3 parity-footer-links">
             <div><h3 className="text-xs uppercase font-semibold text-slate-500 mb-2">Explore MedReach</h3><Link href="/hospitals">Hospitals</Link><Link href="/map">Healthcare map</Link><Link href="/diagnostics">Diagnostics</Link></div>
             <div><h3 className="text-xs uppercase font-semibold text-slate-500 mb-2">Care and requests</h3><Link href="/emergency">Emergency care</Link><Link href="/blood-banks">Blood banks</Link><Link href="/urgent-blood">Urgent blood</Link><Link href="/ambulances">Ambulance providers</Link></div>
             <div><h3 className="text-xs uppercase font-semibold text-slate-500 mb-2">Your next step</h3><Link href="/careers">Healthcare careers</Link><Link href="/track">Track a request</Link><Link href="/login">Sign in</Link><Link href="/profile">Profile and security</Link></div>

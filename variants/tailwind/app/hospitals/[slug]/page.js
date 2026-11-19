@@ -1,4 +1,5 @@
 "use client";
+import HospitalBedAvailability from "../../../components/HospitalBedAvailability";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useHospital, availabilityMeta, saveHospital, useAuth, safeWebUrl } from "@medreach/core";
@@ -77,6 +78,7 @@ export default function HospitalPage() {
         <div className="w-full lg:w-2/3 px-2">
           <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius)] shadow-[var(--shadow-sm)] p-5 mb-3">
             <h2 className="text-xl mb-3">Facilities &amp; current availability</h2>
+            <HospitalBedAvailability hospitalId={hospital.hospitalId || baseHospital?._id} />
             <FacilityStatus facilities={hospital.facilities} />
           </div>
           <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius)] shadow-[var(--shadow-sm)] p-5">

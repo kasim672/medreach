@@ -1,8 +1,10 @@
 "use client";
+import { useHospitalOptions } from "../../../../shared/lib/useHospitalOptions";
+import HospitalBedAvailability from "../../../components/HospitalBedAvailability";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useAuth, listHospitals } from "@medreach/core";
+import { useAuth } from "@medreach/core";
 import { EmergencyIcon } from "../../../components/EmergencyIcons";
 import { post } from "../../../lib/productApi";
 
@@ -43,7 +45,6 @@ const inputClass =
 export default function NewRequest() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const [hospitals, setHospitals] = useState([]);
   const [isEmergency, setIsEmergency] = useState(false);
   const [form, setForm] = useState({
     hospitalId: "",
@@ -89,20 +90,7 @@ export default function NewRequest() {
     }));
   }, []);
 
-  // Fetch hospital listings once on mount and resolve any slug match to MongoDB _id
-  useEffect(() => {
-    listHospitals({ limit: 50 })
-      .then((r) => {
-        const list = r.data || [];
-        setHospitals(list);
-        setForm((old) => {
-          if (!old.hospitalId) return old;
-          const match = list.find((h) => h._id === old.hospitalId || h.slug === old.hospitalId);
-          return match && match._id !== old.hospitalId ? { ...old, hospitalId: match._id } : old;
-        });
-      })
-      .catch((e) => setError(e.message));
-  }, []);
+  const { hospitals, hospitalPage, loadingHospitals, loadMoreHospitals } = useHospitalOptions(setForm, setError);
 
   // Prefill contact details from active user session if fields are untouched
   useEffect(() => {
@@ -249,6 +237,10 @@ export default function NewRequest() {
               </option>
             ))}
           </select>
+          {hospitalPage && <button type="button" className="parity-action parity-action-outline parity-action-small" disabled={loadingHospitals} onClick={loadMoreHospitals}>
+            {loadingHospitals ? "Loading hospitals…" : "Show more hospitals"}
+          </button>}
+          {!isEmergency && selectedHospital && <HospitalBedAvailability key={selectedHospital._id} hospitalId={selectedHospital._id} />}
           {selectedHospital && (
             <div className="text-xs text-[var(--color-muted)] mt-1">
               Selected: <strong className="text-gray-800">{selectedHospital.name}</strong> · {selectedHospital.locality || "Mumbai"}

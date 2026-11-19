@@ -1,4 +1,5 @@
 "use client";
+import CapacityNotice from "./CapacityNotice";
 import Link from "next/link";
 import { useState } from "react";
 import { bedRequestLabel } from "@medreach/core";
@@ -20,6 +21,7 @@ export default function RequestLifecycle({ model }) {
     {request.status === "ACCEPTED" && <p>The hospital accepted the request. Contact staff to confirm the next steps. This is not a bed reservation.</p>}
     {request.status === "EXPIRED" && <p>The response deadline passed. Call the hospital directly; this request is closed.</p>}
     <p className="small text-secondary">Submitted {new Date(request.createdAt).toLocaleString()} · Response deadline {new Date(request.expiresAt).toLocaleString()}</p>
+    <CapacityNotice record={request} resource="bed" />
     <div className="d-flex flex-wrap align-items-center gap-3 my-3">
       {phone && <a style={{ minHeight: 44 }} className="btn btn-outline-secondary py-2" href={`tel:${phone}`}>Call hospital</a>}
       {destination && <a style={{ minHeight: 44 }} className="btn btn-outline-secondary py-2" href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`} target="_blank" rel="noopener noreferrer">Directions</a>}

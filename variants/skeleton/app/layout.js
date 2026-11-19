@@ -1,6 +1,7 @@
 import "skeleton-css/css/normalize.css";
 import "skeleton-css/css/skeleton.css";
 import "./globals.css";
+import "../../shared/parity.css";
 import localFont from "next/font/local";
 import Image from "next/image";
 import Link from "next/link";
@@ -136,7 +137,7 @@ export default function RootLayout({ children }) {
             <span>Emergency hospital discovery · Mumbai · Skeleton variant</span>
             <span className="disclaimer">Not an official emergency service. In danger, call 112.</span>
           </div>
-          <div className="container skeleton-landing-footer-links">
+          <div className="container parity-footer-links">
             <div><h3 className="section-title" style={{ fontSize: "13px", textTransform: "uppercase", fontWeight: "bold", marginBottom: "8px" }}>Explore MedReach</h3><Link href="/hospitals">Hospitals</Link><Link href="/map">Healthcare map</Link><Link href="/diagnostics">Diagnostics</Link></div>
             <div><h3 className="section-title" style={{ fontSize: "13px", textTransform: "uppercase", fontWeight: "bold", marginBottom: "8px" }}>Care and requests</h3><Link href="/emergency">Emergency care</Link><Link href="/blood-banks">Blood banks</Link><Link href="/urgent-blood">Urgent blood</Link><Link href="/ambulances">Ambulance providers</Link></div>
             <div><h3 className="section-title" style={{ fontSize: "13px", textTransform: "uppercase", fontWeight: "bold", marginBottom: "8px" }}>Your next step</h3><Link href="/careers">Healthcare careers</Link><Link href="/track">Track a request</Link><Link href="/login">Sign in</Link><Link href="/profile">Profile and security</Link></div>

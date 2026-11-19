@@ -1,5 +1,6 @@
 "use client";
 
+import CareerVacancyEditor from "../../../components/CareerVacancyEditor";
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
 import { useAuth, useAdminResource, useAdminAction, adminList, adminEntity } from "@medreach/core";
@@ -16,6 +17,10 @@ const initialForm = {
   employmentType: "full_time",
   location: "Mumbai",
   department: "",
+  vacancies: "",
+  requirements: "",
+  salaryText: "",
+  deadline: "",
 };
 
 function isSafeUrl(url) {
@@ -37,13 +42,20 @@ const parseHospitals = adminList("hospital"), parseJobs = adminList("job"), pars
 
 export default function HospitalJobs({ providerMode = false }) {
   const { user, ready } = useAuth();
-  const enabled = ready && Boolean(user);
+  const enabled = ready && ["system_admin", "provider_admin", "hospital_admin"].includes(user?.role);
   const hospitalResource = useAdminResource(providerMode ? loadProviders : loadHospitals, providerMode ? parseProviders : parseHospitals, enabled);
   const jobsResource = useAdminResource(loadJobs, parseJobs, enabled);
   const hospitals = hospitalResource.status === "success" ? hospitalResource.data : [];
   const jobs = jobsResource.status === "success" ? jobsResource.data : [];
   const [form, setForm] = useState(initialForm);
   const [expandedJobId, setExpandedJobId] = useState("");
+  const [jobSearch, setJobSearch] = useState("");
+  const [jobStatus, setJobStatus] = useState("");
+  const visibleJobs = jobs.filter((job) => {
+    const organisation = job.hospital?.name || job.provider?.name || job.organizationName || "";
+    return (!jobStatus || job.status === jobStatus)
+      && `${job.title} ${organisation}`.toLowerCase().includes(jobSearch.trim().toLowerCase());
+  });
   const loadApplicants = useCallback((signal) => productApi(`/api/jobs/${expandedJobId}/applications`, { signal }), [expandedJobId]);
   const applicantResource = useAdminResource(loadApplicants, parseApplications, enabled && Boolean(expandedJobId));
   const applications = applicantResource.status === "success" ? applicantResource.data : [];
@@ -55,7 +67,7 @@ export default function HospitalJobs({ providerMode = false }) {
   const loadApplications = (jobId) => setExpandedJobId((previous) => previous === jobId ? "" : jobId);
   const handleUpdateStatus = (appId, newStatus) => action.run(() => productApi(`/api/applications/${appId}`, { method: "PATCH", body: { status: newStatus } }), { validate: adminEntity("application"), success: `Applicant update to ${newStatus.replaceAll("_", " ")} confirmed.`, refresh: applicantResource.reload, target: appId });
   if (!ready) return <p role="status">Loading hospital careers…</p>;
-  if (!user) return <p>Sign in to manage hospital careers. <Link href="/login?returnTo=%2Fhospital%2Fjobs">Sign in</Link></p>;
+  if (!enabled) return <p>Provider administrator access is required. <Link href={`/login?returnTo=${encodeURIComponent(providerMode ? "/provider/jobs" : "/hospital/jobs")}`}>Sign in</Link></p>;
   return (
     <>
       <Link href={providerMode ? "/provider" : "/hospital"} className="small text-decoration-none">
@@ -65,9 +77,13 @@ export default function HospitalJobs({ providerMode = false }) {
       <div className="page-head my-3">
         <span className="eyebrow">{providerMode ? "Provider" : "Hospital"} Careers Management</span>
         <h1>Job Listings & Applications</h1>
-        <p>Review incoming clinical candidates, qualifications, and manage active departmental drafts.</p>
+        <p>Create a role, send it for review and manage the people who apply. Job applications are separate from general organisation applications.</p>
       </div>
 
+      <nav className="parity-flex parity-wrap parity-gap-3 parity-mb-3" aria-label="On this jobs page">
+        <a href="#provider-job-listings">Review your listings</a>
+        <a href="#provider-job-draft">Create a job draft</a>
+      </nav>
       <AdminActionFeedback action={action} refresh={action.target ? applicantResource.reload : jobsResource.reload} />
 
       <div className="row g-4">
@@ -75,9 +91,21 @@ export default function HospitalJobs({ providerMode = false }) {
         <div className="col-lg-5">
           <AdminDataState resource={hospitalResource} label="career hospital assignments" emptyMessage="No organisation assigned for job creation."><form
             className="surface vstack gap-2"
-            onSubmit={(e) => {
+            id="provider-job-draft"
+            onSubmit={async (e) => {
               e.preventDefault();
-              act(() => post("/api/jobs", providerMode ? { ...form, hospital: hospitals.find((h) => h._id === form.hospital)?.kind === "hospital" ? form.hospital : undefined, provider: hospitals.find((h) => h._id === form.hospital)?.kind !== "hospital" ? form.hospital : undefined } : form), "Job draft created successfully.");
+              const organisation = hospitals.find((item) => item._id === form.hospital);
+              const payload = {
+                ...form,
+                vacancies: form.vacancies === "" ? null : Number(form.vacancies),
+                deadline: form.deadline ? `${form.deadline}T23:59:59+05:30` : undefined,
+              };
+              if (providerMode && organisation?.kind !== "hospital") {
+                payload.provider = form.hospital;
+                delete payload.hospital;
+              }
+              const saved = await act(() => post("/api/jobs", payload), "Job draft created successfully.");
+              if (saved) setForm((previous) => ({ ...initialForm, hospital: previous.hospital }));
             }}
           >
             <h2 className="h5 mb-2">Create Job Draft</h2>
@@ -168,18 +196,55 @@ export default function HospitalJobs({ providerMode = false }) {
 
             <div>
               <label className="form-label small fw-bold" htmlFor="jdescription">
-                Description & Requirements
+                Role description
               </label>
               <textarea
                 id="jdescription"
                 className="form-control form-control-sm"
                 rows={4}
                 minLength={10}
+                maxLength={4000}
                 required
                 placeholder="Outline clinical expectations, shift schedules, and ICU/ward responsibilities…"
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
               />
+            </div>
+
+            <div>
+              <label htmlFor="jdepartment">Department</label>
+              <input id="jdepartment" className="parity-field" maxLength={100} value={form.department}
+                onChange={(event) => setForm({ ...form, department: event.target.value })} />
+            </div>
+
+            <div>
+              <label htmlFor="jvacancies">Total positions (optional)</label>
+              <input id="jvacancies" className="parity-field" type="number" min="0" max="10000" step="1" placeholder="Not reported" value={form.vacancies}
+                onChange={(event) => setForm({ ...form, vacancies: event.target.value })} />
+            </div>
+
+            <div>
+              <label htmlFor="jrequirements">Qualifications and requirements</label>
+              <textarea id="jrequirements" className="parity-field" rows={3} maxLength={2000} value={form.requirements}
+                onChange={(event) => setForm({ ...form, requirements: event.target.value })} />
+            </div>
+
+            <div>
+              <label htmlFor="jlocation">Work location</label>
+              <input id="jlocation" className="parity-field" maxLength={160} value={form.location}
+                onChange={(event) => setForm({ ...form, location: event.target.value })} />
+            </div>
+
+            <div>
+              <label htmlFor="jsalary">Salary or compensation (optional)</label>
+              <input id="jsalary" className="parity-field" maxLength={100} value={form.salaryText}
+                onChange={(event) => setForm({ ...form, salaryText: event.target.value })} />
+            </div>
+
+            <div>
+              <label htmlFor="jdeadline">Application deadline (optional)</label>
+              <input id="jdeadline" className="parity-field" type="date" value={form.deadline}
+                onChange={(event) => setForm({ ...form, deadline: event.target.value })} />
             </div>
 
             <button className="btn btn-primary btn-sm mt-2 fw-bold" disabled={action.disabled || !form.hospital}>
@@ -191,13 +256,37 @@ export default function HospitalJobs({ providerMode = false }) {
         {/* Right Column: Listings & Review Applicants */}
         <div className="col-lg-7">
           <div className="surface">
-            <h2 className="h5 mb-3">Facility Job Listings</h2>
+            <div className="parity-flex parity-between parity-wrap parity-gap-2 parity-mb-3">
+              <h2 className="parity-heading-4" id="provider-job-listings">Your job listings</h2>
+              <button type="button" className="parity-action parity-action-outline" onClick={jobsResource.reload} disabled={jobsResource.status === "loading" || action.disabled}>Refresh listings</button>
+            </div>
+            <div className="parity-grid parity-mb-3">
+              <div className="parity-span-half-small">
+                <label className="parity-field-label" htmlFor="managed-job-search">Find a role or organisation</label>
+                <input id="managed-job-search" className="parity-field" value={jobSearch} onChange={(event) => { setJobSearch(event.target.value); setExpandedJobId(""); }} />
+              </div>
+              <div className="parity-span-half-small">
+                <label className="parity-field-label" htmlFor="managed-job-status">Listing status</label>
+                <select id="managed-job-status" className="parity-field" value={jobStatus} onChange={(event) => { setJobStatus(event.target.value); setExpandedJobId(""); }}>
+                  <option value="">All statuses</option>
+                  <option value="draft">Draft</option>
+                  <option value="pending">Awaiting review</option>
+                  <option value="published">Published</option>
+                  <option value="closed">Closed</option>
+                  <option value="rejected">Not approved</option>
+                </select>
+              </div>
+            </div>
             <AdminDataState resource={jobsResource} label="managed jobs" emptyMessage="No job listings found for your managed hospitals.">
 
-            {jobs.map((job) => {
+            {jobs.length > 0 && !visibleJobs.length && <p role="status">
+              No listings match your filters.{" "}
+              <button type="button" className="parity-action parity-action-link" onClick={() => { setJobSearch(""); setJobStatus(""); }}>Clear job filters</button>
+            </p>}
+            {visibleJobs.map((job) => {
               const isExpanded = expandedJobId === job._id;
               return (
-                <div key={job._id} className="border-top py-3">
+                <article key={job._id} className="provider-request-row" aria-label={job.title}>
                   <div className="d-flex justify-content-between align-items-start gap-2">
                     <div>
                       <strong className="h6 d-block mb-1">{job.title}</strong>
@@ -205,16 +294,17 @@ export default function HospitalJobs({ providerMode = false }) {
                         {job.hospital?.name || job.provider?.name} · <span className="text-capitalize">{job.category}</span> · {job.employmentType?.replaceAll("_", " ")}
                       </p>
                     </div>
-                    <span className="status-pill tone-info text-capitalize">{job.status}</span>
+                    <span className="status-pill tone-info text-capitalize">{job.status === "pending" ? "Awaiting review" : job.status === "rejected" ? "Not approved" : job.status}</span>
                   </div>
 
+                  {job.status === "pending" && <p className="parity-muted">Waiting for System Admin review. This role is not public yet.</p>}
                   <div className="d-flex flex-wrap gap-2 mb-2">
                     {job.status === "draft" && (
                       <button disabled={action.disabled}
                         className="btn btn-sm btn-outline-primary"
                         onClick={() => act(() => post(`/api/jobs/${job._id}/status`, { status: "published" }), "Listing submission confirmed. Check its status for publication or pending review.")}
                       >
-                        Publish Listing
+                        {user.role === "system_admin" ? "Publish listing" : "Submit for review"}
                       </button>
                     )}
                     {job.status === "published" && (
@@ -234,6 +324,11 @@ export default function HospitalJobs({ providerMode = false }) {
                       {isExpanded ? "Hide Applicants" : "Review Applicants"}
                     </button>
                   </div>
+
+                  <CareerVacancyEditor job={job} disabled={action.disabled} onSave={(body) => act(
+                  () => productApi(`/api/jobs/${job._id}/availability`, { method: "PATCH", body }),
+                  "Position counts updated.",
+                )} />
 
                   {/* Collapsible Applicants Panel */}
                   {isExpanded && (
@@ -377,7 +472,7 @@ export default function HospitalJobs({ providerMode = false }) {
                       </AdminDataState>
                     </div>
                   )}
-                </div>
+                </article>
               );
             })}
             </AdminDataState>

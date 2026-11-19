@@ -1,7 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test("Users and System Admins have separate pages and the sidebar links only for authorised admins", async ({ page }, info) => {
-  test.skip(info.project.name !== "bootstrap", "Bootstrap account navigation only");
+test("Users and System Admins have separate pages and the sidebar links only for authorised admins", async ({ page }) => {
   let accountRole = "system_admin";
   let reads = 0;
   await page.route("**/api/auth/me", route => route.fulfill({ json: { user: { _id: "111111111111111111111111", role: accountRole, name: "Reviewer", region: "Mumbai" } } }));

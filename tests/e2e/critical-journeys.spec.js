@@ -436,7 +436,7 @@ test("application sign-in preserves its destination and system admin reaches the
   await expect(signIn).toHaveAttribute("href", `/login?returnTo=${encodeURIComponent(`/jobs/${job._id}`)}`);
 
   await login(page, `${testInfo.project.name}.admin.e2e@medreach.test`, "/admin");
-  await expect(page.getByRole("heading", { name: testInfo.project.name === "bootstrap" ? "Platform overview" : "Admin dashboard" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Platform overview" })).toBeVisible();
   await expect(page.getByText("Hospitals tracked", { exact: true })).toBeVisible();
   await page.goto("/admin/users");
   await expect(page.getByRole("heading", { name: "User management" })).toBeVisible();
@@ -499,7 +499,7 @@ test("tracking needs only a reference and public results exclude personal detail
   await page.goto("/track");
   await expect(page.locator("#tracking-type option")).toHaveText([
     "Blood request or donation pledge", "Bed request", "Career request", "Ambulance booking",
-    ...(testInfo.project.name === "bootstrap" ? ["Diagnostic test request"] : []),
+    "Diagnostic test request",
   ]);
   await expect(page.locator("#tracking-token")).toHaveCount(0);
   await expect(page.getByText(/Private tracking token|Guest tokens are included/)).toHaveCount(0);
@@ -529,10 +529,10 @@ test("tracking needs only a reference and public results exclude personal detail
     await page.locator("#tracking-type").selectOption(type);
     await page.getByLabel("Reference", { exact: true }).fill("invalid-reference");
     await page.getByRole("button", { name: "Check status", exact: true }).click();
-    await expect(page.locator(".alert[role=alert]")).toContainText(/Check the request type and reference/i);
+    await expect(page.locator("#main").getByRole("alert")).toContainText(/Check the request type and reference/i);
     await page.getByLabel("Reference", { exact: true }).fill(reference);
     await page.getByRole("button", { name: "Check status", exact: true }).click();
-    await expect(page.locator(".alert[role=alert]")).toContainText(/Request not found/i);
+    await expect(page.locator("#main").getByRole("alert")).toContainText(/Request not found/i);
   }
   await page.goto(`/track?type=blood&reference=${blood.reference}#token=${encodeURIComponent(blood.trackingToken)}`);
   await expect(page.getByRole("region", { name: "Request status" })).toContainText("Blood group: AB-");

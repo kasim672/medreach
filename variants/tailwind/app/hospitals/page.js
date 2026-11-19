@@ -17,6 +17,8 @@ export default function HospitalsPage() {
   const { origin, label: locLabel, status, useGps: requestGps, useLocality: selectLocality, error } = useLocation();
 
   const filters = useMemo(() => ({
+    limit: 50,
+    view: "summary",
     q: q || undefined, specialty: specialty || undefined,
     hospitalType: hospitalType || undefined,
     facilities: facility ? [facility] : [],
@@ -36,7 +38,7 @@ export default function HospitalsPage() {
       <form className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius)] shadow-[var(--shadow-sm)] p-5 mb-4" role="search" onSubmit={(e) => e.preventDefault()}>
         <div className="flex flex-wrap -mx-1 items-end">
           <div className="w-full md:w-1/3 px-1 mb-2">
-            <label htmlFor="q" className={label}>Search</label>
+            <label htmlFor="q" className={label}>Search hospitals</label>
             <input id="q" className={control} value={q} onChange={(e) => setQ(e.target.value)} placeholder="e.g. cardiac Andheri, ICU Bandra" />
           </div>
           <div className="w-1/2 md:w-1/6 px-1 mb-2">

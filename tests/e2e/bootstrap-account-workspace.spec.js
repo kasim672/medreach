@@ -1,7 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test.beforeEach(async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== "bootstrap", "Bootstrap account theme only");
+test.beforeEach(async ({ page }) => {
   await page.route((url) => url.pathname.startsWith("/api/"), (route) => {
     const path = new URL(route.request().url()).pathname;
     const user = { _id: "111111111111111111111111", name: "Test administrator", email: "fixture@example.test", role: "system_admin", region: "Mumbai", savedHospitals: [] };
@@ -15,6 +14,7 @@ test.beforeEach(async ({ page }, testInfo) => {
 });
 
 test("account theme persists across admin navigation, dashboard and profile", async ({ page }, info) => {
+  test.skip(info.project.name !== "bootstrap", "Bootstrap account theme only");
   for (const width of [1466, 390]) {
     await page.setViewportSize({ width, height: 900 });
     for (const path of ["/admin", "/admin/provider-approvals", "/admin/provider-accounts", "/dashboard", "/profile"]) {
@@ -45,7 +45,7 @@ test("logout cancel and Escape preserve the session and return focus", async ({ 
   let requests = 0;
   await page.route("**/api/auth/logout", (route) => { requests++; return route.fulfill({ json: { ok: true } }); });
   await page.goto("/admin");
-  const trigger = page.getByRole("button", { name: "Log out", exact: true });
+  const trigger = page.getByRole("navigation", { name: "Account", exact: true }).getByRole("button", { name: "Log out", exact: true });
   await trigger.click();
   const dialog = page.getByRole("dialog", { name: "Log out of MedReach?" });
   await expect(dialog).toBeVisible();

@@ -1,0 +1,50 @@
+"use client";
+import { useEffect, useState } from "react";
+import { productApi } from "../lib/productApi";
+
+export default function HospitalBedAvailability({ hospitalId }) {
+  const [snapshot, setSnapshot] = useState(null);
+  const [failed, setFailed] = useState(false);
+  const [revision, setRevision] = useState(0);
+  const [now, setNow] = useState(Date.now);
+  const result = snapshot?.hospitalId === hospitalId ? snapshot.rows : null;
+  useEffect(() => {
+    const controller = new AbortController();
+    setSnapshot(null); setFailed(false);
+    if (!hospitalId) return () => controller.abort();
+    productApi(`/api/inventory/hospital/${encodeURIComponent(hospitalId)}`, { signal: controller.signal, cache: "no-store" })
+      .then(value => { if (!controller.signal.aborted) { setSnapshot({ hospitalId, rows: value.data || [] }); setNow(Date.now()); } })
+      .catch(() => { if (!controller.signal.aborted) setFailed(true); });
+    return () => controller.abort();
+  }, [hospitalId, revision]);
+  useEffect(() => {
+    const refresh = () => { if (document.visibilityState === "visible") setRevision(value => value + 1); };
+    const timer = setInterval(refresh, 30000);
+    window.addEventListener("focus", refresh);
+    return () => { clearInterval(timer); window.removeEventListener("focus", refresh); };
+  }, [hospitalId]);
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 15000);
+    return () => clearInterval(timer);
+  }, []);
+  useEffect(() => {
+    const next = result?.map(row => new Date(row.expiresAt).getTime()).filter(value => Number.isFinite(value) && value > Date.now()).sort((a, b) => a - b)[0];
+    if (!next) return;
+    const timer = setTimeout(() => setNow(Date.now()), next - Date.now() + 1);
+    return () => clearTimeout(timer);
+  }, [result, now]);
+  return <section className="surface parity-p-3 parity-mb-4" aria-label="Current hospital bed availability">
+    <div className="parity-flex parity-between parity-wrap parity-gap-2 parity-center-items parity-mb-3"><h2 className="parity-heading-5 parity-mb-0">Bed availability</h2><button type="button" className="parity-action parity-action-outline-primary parity-action-small" disabled={!hospitalId} onClick={() => setRevision(value => value + 1)}>Refresh bed counts</button></div>
+    {!result && !failed ? <p role="status">Checking the latest verified report…</p> : <>
+      <div className="parity-grid parity-grid-gap">{[["general_beds", "General beds"], ["icu_beds", "ICU beds"]].map(([key, label]) => {
+        const row = result?.find(value => value.resourceKey === key);
+        const verified = row?.classification === "provider_confirmed" && row.expiresAt && new Date(row.expiresAt).getTime() > now && Number.isSafeInteger(row.available) && row.available >= 0;
+        return <div className="parity-span-half" key={key}><strong className="parity-block">{label}</strong><span className="parity-block parity-size-five">{verified ? `${row.available} available` : "Availability unknown"}</span>
+          {verified && Number.isSafeInteger(row.capacity) && row.capacity >= row.available && <p className="parity-muted parity-mb-1">Operational capacity: {row.capacity}</p>}
+          {verified && row.observedAt && Number.isFinite(new Date(row.observedAt).getTime()) && <p className="parity-muted parity-mb-0">Observed {new Date(row.observedAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })} IST</p>}
+        </div>;
+      })}</div>
+      <p className="parity-muted parity-mt-3 parity-mb-0">{failed ? "The latest report could not be loaded. " : ""}Counts are shown only for fresh provider-confirmed inventory. The hospital must confirm your request.</p>
+    </>}
+  </section>;
+}

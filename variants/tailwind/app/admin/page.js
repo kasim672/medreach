@@ -1,14 +1,8 @@
 "use client";
-import { adminOverview, adminOverviewData, useAdminResource, useAdminAccess } from "@medreach/core";
+import View from "../../../shared/components/AdminOverview";
 import AdminGuard from "../../components/AdminGuard";
 import AdminDataState from "../../components/AdminDataState";
-const loadTotals = (signal) => adminOverview({ signal });
-export default function AdminOverviewPage() {
-  const { allowed } = useAdminAccess();
-  const totals = useAdminResource(loadTotals, adminOverviewData, allowed);
-  return <AdminGuard title="Admin dashboard" subtitle="Hospital totals and platform administration.">
-    <section className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius)] p-5 mb-3" aria-label="Hospital totals"><AdminDataState resource={totals} label="hospital totals">
-      {(data) => <>{data.hospitals === 0 && <p>No hospitals are stored.</p>}<div className="grid grid-cols-2 lg:grid-cols-4 gap-3">{[["Hospitals tracked", data.hospitals]].map(([label, value]) => <div key={label}><span className="text-3xl font-bold">{value}</span><p>{label}</p></div>)}</div></>}
-    </AdminDataState></section>
-  </AdminGuard>;
+
+export default function AdminOverviewAdapter() {
+  return <View AdminGuard={AdminGuard} AdminDataState={AdminDataState} />;
 }

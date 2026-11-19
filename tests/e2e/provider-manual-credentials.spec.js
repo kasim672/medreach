@@ -1,7 +1,6 @@
 import { test, expect } from "@playwright/test";
 
 // Manual credential handover is currently an explicitly Bootstrap-only feature.
-test.beforeEach(({}, info) => { test.skip(info.project.name !== "bootstrap", "Bootstrap manual credential UI scope"); });
 
 // Browser fixtures only: never mutate the recovered dataset or send email.
 const id = "111111111111111111111111", organizationId = "222222222222222222222222";

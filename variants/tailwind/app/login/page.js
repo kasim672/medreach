@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { profileDestination, safeReturnTo, useAuth, validateLogin, validateRegister } from "@medreach/core";
+import { profileDestination, safeReturnTo, useAuth, validateLogin } from "@medreach/core";
 import Link from "next/link";
 
 const control = "w-full rounded-[var(--radius)] border border-[var(--color-border)] bg-white px-3 py-2 focus:outline-none";
@@ -11,9 +11,8 @@ export default function LoginPage() {
   const router = useRouter();
   const submitting = useRef(false);
   const [busy, setBusy] = useState(false);
-  const { login, register } = useAuth();
-  const [mode, setMode] = useState("login");
-  const [form, setForm] = useState({ email: "", password: "", name: "" });
+  const { login } = useAuth();
+  const [form, setForm] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [notice, setNotice] = useState("");
@@ -27,8 +26,7 @@ export default function LoginPage() {
     if (params.get("registered") === "1") {
       const pendingEmail = window.sessionStorage.getItem("medreach:pending-registration-email") || "";
       window.sessionStorage.removeItem("medreach:pending-registration-email");
-      setMode("login");
-      setForm({ email: pendingEmail, password: "", name: "" });
+      setForm({ email: pendingEmail, password: "" });
       setNotice("Registration accepted. Check your email for verification instructions, then sign in to continue.");
     }
   }, []);
@@ -38,27 +36,18 @@ export default function LoginPage() {
     if (submitting.current) return;
     setServerError("");
     setNotice("");
-    const check = mode === "login" ? validateLogin(form) : validateRegister(form);
+    const check = validateLogin(form);
     setErrors(check.errors);
     if (!check.valid) return;
     submitting.current = true;
     setBusy(true);
     try {
-      if (mode === "login") {
-        const user = await login(form.email, form.password);
-        router.push(profileDestination(user, returnTo));
-      } else {
-        const result = await register({ email: form.email, password: form.password, name: form.name });
-        if (result.accepted && !result.user) {
-          setMode("login");
-          setForm({ email: form.email, password: "", name: "" });
-          setErrors({});
-          setNotice(`${result.message} Sign in to continue.`);
-        }
-        else router.push(profileDestination(result.user, returnTo));
-      }
+      const user = await login(form.email, form.password);
+      setForm((current) => ({ ...current, password: "" }));
+      router.push(profileDestination(user, returnTo));
     } catch (err) {
       setServerError(err.message);
+      setForm((current) => ({ ...current, password: "" }));
     } finally {
       submitting.current = false;
       setBusy(false);
@@ -69,18 +58,11 @@ export default function LoginPage() {
     <div className="flex justify-center">
       <div className="w-full md:w-7/12 lg:w-5/12">
         <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius)] shadow-[var(--shadow-sm)] p-5">
-          <h1 className="text-2xl mb-1">{mode === "login" ? "Welcome back" : "Create account"}</h1>
+          <h1 className="text-2xl mb-1">Welcome back</h1>
           <p className="text-[.78rem] text-[var(--color-muted)] mb-3">Sign in to save hospitals for quick access.</p>
           {serverError && <div className="rounded bg-[var(--color-danger-bg)] text-[var(--color-danger)] px-3 py-2 mb-3">{serverError}</div>}
           {notice && <div className="rounded bg-green-50 border border-green-200 text-green-800 px-3 py-2 mb-3" role="status">{notice}</div>}
           <form aria-busy={busy} onSubmit={submit} noValidate className="flex flex-col gap-3">
-            {mode === "register" && (
-              <div>
-                <label htmlFor="name" className="block font-semibold mb-1">Name</label>
-                <input id="name" className={`${control} ${errors.name ? controlInvalid : ""}`} value={form.name} onChange={set("name")} />
-                {errors.name && <div className="text-[var(--color-danger)] text-sm mt-1">{errors.name}</div>}
-              </div>
-            )}
             <div>
               <label htmlFor="email" className="block font-semibold mb-1">Email</label>
               <input id="email" type="email" autoComplete="email" className={`${control} ${errors.email ? controlInvalid : ""}`} value={form.email} onChange={set("email")} />
@@ -88,18 +70,13 @@ export default function LoginPage() {
             </div>
             <div>
               <label htmlFor="password" className="block font-semibold mb-1">Password</label>
-              <input id="password" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} className={`${control} ${errors.password ? controlInvalid : ""}`} value={form.password} onChange={set("password")} />
+              <input id="password" type="password" autoComplete="current-password" className={`${control} ${errors.password ? controlInvalid : ""}`} value={form.password} onChange={set("password")} />
               {errors.password && <div className="text-[var(--color-danger)] text-sm mt-1">{errors.password}</div>}
             </div>
-            <button className="inline-flex items-center justify-center font-bold text-lg rounded-[var(--radius)] bg-[var(--color-emergency)] text-white px-4 py-2 hover:bg-[var(--color-emergency-dark)]" type="submit" disabled={busy}>{busy ? (mode === "login" ? "Signing in…" : "Creating account…") : (mode === "login" ? "Sign in" : "Create account")}</button>
+            <button className="inline-flex items-center justify-center font-bold text-lg rounded-[var(--radius)] bg-[var(--color-emergency)] text-white px-4 py-2 hover:bg-[var(--color-emergency-dark)]" type="submit" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</button>
           </form>
-          <div className="text-center mt-3">
-            <button className="p-0 bg-transparent text-[var(--color-emergency-dark)] underline" disabled={busy} onClick={() => { setMode(mode === "login" ? "register" : "login"); setErrors({}); }}>
-              {mode === "login" ? "Need an account? Register" : "Have an account? Sign in"}
-            </button>
-          </div>
-          {mode === "login" && <p className="text-center text-sm mt-2 mb-0"><Link href={`/register?returnTo=${encodeURIComponent(returnTo)}`} className="text-[var(--color-emergency-dark)] underline">Open the registration page</Link></p>}
-          {mode === "login" && <p className="text-center text-sm mt-2 mb-0"><Link href="/forgot-password" className="text-[var(--color-emergency-dark)] underline">Forgot password?</Link></p>}
+          <p className="text-center text-sm mt-2 mb-0"><Link href={`/register?returnTo=${encodeURIComponent(returnTo)}`} className="text-[var(--color-emergency-dark)] underline">Need an account? Register here</Link></p>
+          <p className="text-center text-sm mt-2 mb-0"><Link href="/forgot-password" className="text-[var(--color-emergency-dark)] underline">Forgot password?</Link></p>
         </div>
       </div>
     </div>

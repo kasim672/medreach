@@ -2,13 +2,12 @@ import { test, expect } from "@playwright/test";
 
 const API = process.env.MEDREACH_HOME_TEST_API_URL || "http://localhost:4000";
 const dateInIndia = date => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
-test.beforeEach(async ({ page }, info) => {
-  test.skip(info.project.name !== "bootstrap", "Diagnostic request frontend is Bootstrap only");
+test.beforeEach(async ({ page }) => {
   page.__diagnosticErrors = [];
   page.on("pageerror", error => page.__diagnosticErrors.push(error.message));
 });
-test.afterEach(async ({ page }, info) => {
-  if (info.project.name === "bootstrap") expect(page.__diagnosticErrors).toEqual([]);
+test.afterEach(async ({ page }) => {
+  expect(page.__diagnosticErrors).toEqual([]);
 });
 
 async function fillRequest(page) {

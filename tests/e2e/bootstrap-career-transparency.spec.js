@@ -2,8 +2,7 @@ import { test, expect } from "@playwright/test";
 
 const hospitalId = "111111111111111111111111", jobId = "777777777777777777777777";
 const job = { _id: jobId, __v: 2, title: "Ward Nurse", organizationName: "Synthetic Career Hospital", hospital: { _id: hospitalId, name: "Synthetic Career Hospital" }, description: "Care for patients in the general ward.", employmentType: "full_time", category: "Nurse", status: "published", vacancies: 5, filledPositions: 2, availability: { total: 5, filled: 2, remaining: 3, acceptingApplications: true, reportedAt: new Date().toISOString() } };
-test.beforeEach(async ({ page }, info) => {
-  test.skip(info.project.name !== "bootstrap", "Career transparency is Bootstrap only");
+test.beforeEach(async ({ page }) => {
   await page.route("**/api/**", async route => {
     const url = new URL(route.request().url());
     let body = { data: [] };

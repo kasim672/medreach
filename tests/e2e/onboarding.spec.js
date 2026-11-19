@@ -38,10 +38,9 @@ test("public landing application persists, prevents duplicate clicks and is appr
   await expect(card).toContainText("approved");
   await page.goto("/admin/provider-accounts");
   const account = page.locator("article").filter({ hasText: name });
-  if (info.project.name === "bootstrap") await expect(account.locator(".status-pill")).toHaveText("pending");
-  else await expect(account).toContainText(/[Ss]tatus: pending/);
+  await expect(account.locator(".status-pill")).toHaveText("pending");
   await expect(account).toContainText(".example");
-  await expect(account).toContainText(info.project.name === "bootstrap" ? "Invitation: disabled" : /Activation email(?: status)?: disabled/);
+  await expect(account).toContainText("Invitation: disabled");
 });
 
 test("landing form, login and Careers fit mobile and desktop viewports", async ({ page }) => {

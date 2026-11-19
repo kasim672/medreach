@@ -3,8 +3,7 @@ import { test, expect } from "@playwright/test";
 const hospitalId = "111111111111111111111111";
 const centreId = "222222222222222222222222";
 const reference = "DX-0123456789ABCDEF0123";
-test.beforeEach(async ({ page }, info) => {
-  test.skip(info.project.name !== "bootstrap", "Capacity form changes apply to Bootstrap only");
+test.beforeEach(async ({ page }) => {
   await page.route("**/api/**", async route => {
     const url = new URL(route.request().url());
     let body = { data: [] };

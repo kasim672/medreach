@@ -1,4 +1,5 @@
 "use client";
+import { diagnosticStatusLabel } from "../../lib/diagnostics";
 import Link from "next/link";
 import { useDashboard } from "../../lib/useDashboard";
 import CareerReference from "../../components/CareerReference";
@@ -14,11 +15,11 @@ function SectionFeedback({ section, title, onRetry, children }) {
 }
 
 export default function Dashboard() {
-  const { profile, requests, blood, ambulance, applications, retry } = useDashboard();
+  const { profile, requests, blood, ambulance, diagnostic, applications, retry } = useDashboard();
   const user = profile.data;
 
   return <>
-    <nav aria-label="User dashboard sections"><Link href="/dashboard">Home</Link> · <Link href="/hospitals">Find Services</Link> · <Link href="/requests">My Requests</Link> · <Link href="/blood-banks">Blood Donation</Link> · <Link href="/careers">Careers</Link> · <Link href="/profile">My Profile</Link></nav>
+    <nav aria-label="User dashboard sections"><Link href="/dashboard">Home</Link> · <Link href="/hospitals">Find Services</Link> · <Link href="/requests">My Requests</Link> · <Link href="/blood-banks">Blood Donation</Link> · <Link href="/careers">Careers</Link> · <Link href="/profile">Profile &amp; security</Link>{user?.role === "system_admin" && <> · <Link href="/admin">Admin workspace</Link> · <Link href="/admin/system-admins">System Admins</Link></>}{["provider_admin", "hospital_admin"].includes(user?.role) && <> · <Link href="/provider">Provider workspace</Link></>}</nav>
     <div className="page-head mb-4"><span className="eyebrow">Your MedReach</span><h1>{user?.name ? `Welcome, ${user.name.split(" ")[0]}` : "Dashboard"}</h1><p>Quick access to your requests, applications, saved hospitals.</p></div>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <section className="bg-white rounded-lg border border-[var(--color-border)] shadow-sm p-5" aria-labelledby="dashboard-requests">
@@ -47,6 +48,14 @@ export default function Dashboard() {
               </div>
             )) : <p>No blood requests or donation pledges recorded.</p>}
       </SectionFeedback>
+      <section className="surface parity-p-4" aria-labelledby="dashboard-diagnostic">
+        <h2 id="dashboard-diagnostic">Diagnostic test requests</h2>
+        <SectionFeedback section={diagnostic} title="Diagnostic test requests" onRetry={() => retry("diagnostic")}>
+          {diagnostic.data?.length ? <ul>{diagnostic.data.slice(0, 4).map(row => <li key={row.reference || row._id}>
+            <Link href={`/track?type=diagnostic&reference=${encodeURIComponent(row.reference)}`}>{row.reference}</Link> · {diagnosticStatusLabel(row.status)}
+          </li>)}</ul> : <p>No diagnostic test requests recorded.</p>}
+        </SectionFeedback>
+      </section>
       <SectionFeedback section={ambulance} title="Ambulance requests" onRetry={() => retry("ambulance")}>
             {ambulance.data?.length ? ambulance.data.slice(0, 2).map((a) => (
               <div key={a._id} className="text-sm">

@@ -17,24 +17,20 @@ async function signIn(page, email) {
 }
 test("System Admin retains the main dashboard and provisions a pending real provider account", async ({ page }, info) => {
   await signIn(page, "admin.e2e@medreach.test");
-  await page.goto("/admin"); await expect(page.getByRole("link", { name: "Provider Accounts", exact: true })).toBeVisible();
-  await page.getByRole("link", { name: "Provider Accounts", exact: true }).click();
+  await page.goto("/admin");
+  const adminNav = page.getByRole("navigation", { name: "Admin sections" });
+  await adminNav.getByRole("link", { name: "Provider Accounts", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Provider Accounts", exact: true })).toBeVisible();
   await page.getByLabel("Organisation", { exact: true }).selectOption({ label: "MedReach E2E Hospital · hospital" });
-  if (info.project.name === "bootstrap") await page.getByLabel("Credential delivery", { exact: true }).selectOption("invitation");
+  await page.getByLabel("Credential delivery", { exact: true }).selectOption("invitation");
   const email = `${info.project.name}.${Date.now()}@provider-company.com`;
   await page.getByLabel("Login email", { exact: true }).fill(email);
   await page.getByLabel("Real notification / invitation email", { exact: true }).fill(`contact.${email}`);
   await page.getByRole("button", { name: "Create Provider Admin account", exact: true }).click();
   await expect(page.getByText(/Account provisioning confirmed/)).toBeVisible();
   const card = page.locator("article").filter({ hasText: email });
-  if (info.project.name === "bootstrap") {
-    await expect(card.locator(".status-pill")).toHaveText("pending");
-    await expect(card.getByText("Invitation: disabled", { exact: true })).toBeVisible();
-  } else {
-    await expect(card.getByText(/[Ss]tatus: pending/)).toBeVisible();
-    await expect(card.getByText(/Activation email(?: status)?: disabled/)).toBeVisible();
-  }
+  await expect(card.locator(".status-pill")).toHaveText("pending");
+  await expect(card.getByText("Invitation: disabled", { exact: true })).toBeVisible();
   await expect(card.getByText(/Demo default:/)).toHaveCount(0);
 });
 test("Regular users cannot access administrative dashboards and retired support route is absent", async ({ page }) => {
@@ -49,10 +45,9 @@ test("Regular users cannot access administrative dashboards and retired support 
 test("Provider Admin can use assigned hospital and blood workflows and provider Careers", async ({ page }, info) => {
   await signIn(page, `${info.project.name}.provider.e2e@medreach.test`);
   await page.goto("/provider"); await expect(page.getByRole("heading", { name: "Provider workspace", exact: true })).toBeVisible();
-  await expect(page.getByLabel(info.project.name === "bootstrap" ? "Assigned organisation" : "Organisation", { exact: true })).toHaveCount(1);
+  await expect(page.getByLabel("Assigned organisation", { exact: true })).toHaveCount(1);
   await expect(page.getByRole("button", { name: "Save contact information" })).toBeVisible();
-  if (info.project.name === "bootstrap") await page.getByRole("navigation", { name: "Provider sections" }).getByRole("link", { name: "Jobs & applicants", exact: true }).click();
-  else await page.getByRole("link", { name: "Manage provider jobs and applicants" }).click();
+  await page.getByRole("navigation", { name: "Provider sections" }).getByRole("link", { name: "Jobs & applicants", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Job Listings & Applications" })).toBeVisible();
   await expect(page.getByRole("combobox", { name: "Assigned organisation", exact: true }).locator("option")).toHaveCount(2);
   await page.goto("/admin"); await expect(page.getByText(/Admin access required/)).toBeVisible();

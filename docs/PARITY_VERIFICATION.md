@@ -10,20 +10,27 @@ identical interactions or isolate CSS as the only research variable.
 
 Discovery/detail/maps; provider applications and approval; common login;
 organisation-scoped provider administration; standard/emergency bed requests;
-normal/urgent blood requests and blood donation; ambulance bookings; jobs and
-applications; reference tracking; user history and grounded assistant actions.
+normal/urgent blood requests and blood donation; ambulance bookings; routine
+and emergency diagnostic requests; published jobs and vacancy management;
+reference tracking; user history and grounded assistant actions. Provider
+workspaces include inventory and organisation-specific request management.
+
+Directory searches use service-specific paginated reads. A preselected hospital
+loads its option and, for ordinary requests, its verified bed inventory.
+Emergency requests do not show numerical bed availability. Account navigation
+follows the signed-in role, and sign-out requires confirmation.
 
 Loading, true empty, failure and targeted Retry behavior must remain distinct.
-The homepage and dashboard now publish successful resources independently.
+The homepage and dashboard publish successful resources independently.
 
 ## Intentional differences
 
-- Bootstrap has local manual credential handover, generated password visibility
-  and copy controls. The six tests in `provider-manual-credentials.spec.js`
-  target that implementation; Tailwind/Skeleton keep invitation administration.
+- Manual credential handover follows the existing backend policy in all three
+  variants. The generated password is available for immediate handover only,
+  and the browser tests check that it is not retained after navigation.
 - Skeleton provides an additional career-tracking copy/manual-selection control.
-- Existing Bootstrap-specific navbar, footer and demo-video regression tests
-  are explicitly scoped; shared navigation/responsive journeys cover all three.
+- Bootstrap-specific navbar style and demo-video tests remain scoped to that
+  variant. Shared navigation, footer and responsive journeys cover all three.
 - Bootstrap aliases its local `_core`; the other variants use the workspace
   core. Homepage orchestration is deliberately shared.
 

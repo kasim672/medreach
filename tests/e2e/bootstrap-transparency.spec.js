@@ -4,8 +4,7 @@ const centreId = "222222222222222222222222";
 const hospitalId = "111111111111111111111111";
 const dateInMumbai = offset => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(Date.now() + offset * 86400000));
 
-test.beforeEach(async ({ page }, info) => {
-  test.skip(info.project.name !== "bootstrap", "Transparency UI is Bootstrap only");
+test.beforeEach(async ({ page }) => {
   await page.route("**/api/**", async route => {
     const url = new URL(route.request().url());
     let body = { data: [] };

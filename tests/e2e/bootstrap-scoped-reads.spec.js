@@ -1,6 +1,5 @@
 import { test, expect } from "@playwright/test";
 
-test.beforeEach(async ({}, info) => { test.skip(info.project.name !== "bootstrap", "Bootstrap scoped directory"); });
 
 test("diagnostic search fetches only bounded diagnostic pages and debounces typing", async ({ page }) => {
   const requests = [];

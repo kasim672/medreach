@@ -75,12 +75,8 @@ test.describe("MEDREACH Footer Layout and Branding", () => {
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
     await page.waitForTimeout(100);
 
-    const linksContainer = page.locator(
-      ".landing-footer-links, .tw-landing-footer-links, .skeleton-landing-footer-links"
-    );
-    await expect(linksContainer).toBeVisible();
-
-    const mapLink = linksContainer.locator('a[href="/map"]');
+    const footer = page.getByRole("contentinfo");
+    const mapLink = footer.getByRole("link", { name: "Healthcare map", exact: true });
     await expect(mapLink).toBeVisible();
     await mapLink.click();
     await expect(page).toHaveURL(/\/map$/);

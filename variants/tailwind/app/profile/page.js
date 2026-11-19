@@ -2,7 +2,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { authStatus, changePassword, logout, me, revokeSession,
+import LogoutButton from "../../components/LogoutButton";
+import { authStatus, changePassword, me, revokeSession,
   safeReturnTo, updateProfile } from "@medreach/core";
 
 const date = (value) => value ? new Date(value).toLocaleString() : "Unknown";
@@ -55,7 +56,6 @@ export default function Profile() {
     } catch (error) { setStatus(error.message); }
     finally { setBusy(false); }
   };
-  const signOut = async () => { await logout(); window.dispatchEvent(new Event("medreach:auth-changed")); router.push("/login"); };
   if (!user) return <div className="bg-white rounded-lg border border-[var(--color-border)] shadow-sm p-5"><h1 className="h3">Profile & security</h1><p role="status">{status || "Loading account…"}</p></div>;
   return <><div className="page-head mb-4"><span className="eyebrow">Account</span><h1>{onboarding ? "Complete your profile" : "Profile & security"}</h1>
     <p>{onboarding ? "Add your region so MedReach can prioritize nearby care and regional alerts." : "Manage your verified email, password, and active sessions."}</p></div>
@@ -188,7 +188,7 @@ export default function Profile() {
               <h2 className="text-xl font-bold text-gray-900 mb-1">Active sessions</h2>
               <p className="text-xs text-gray-500 mb-0">Only hashed device and network fingerprints are stored.</p>
             </div>
-            <button className="border border-red-500 text-red-600 font-semibold px-4 py-2 rounded-md hover:bg-red-50 text-sm transition-colors" onClick={signOut}>Log out this browser</button>
+            <LogoutButton className="border border-red-500 text-red-600 font-semibold px-4 py-2 rounded-md hover:bg-red-50 text-sm transition-colors">Log out this browser</LogoutButton>
           </div>
           <div className="table-responsive mt-4 overflow-x-auto">
             <table className="w-full text-left text-sm">

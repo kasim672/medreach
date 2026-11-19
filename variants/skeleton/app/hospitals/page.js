@@ -13,6 +13,8 @@ export default function HospitalsPage() {
   const { origin, label, status, useGps: requestGps, useLocality: selectLocality, error } = useLocation();
 
   const filters = useMemo(() => ({
+    limit: 50,
+    view: "summary",
     q: q || undefined, specialty: specialty || undefined,
     hospitalType: hospitalType || undefined,
     facilities: facility ? [facility] : [],
@@ -32,7 +34,7 @@ export default function HospitalsPage() {
       <form className="surface mb-4" role="search" onSubmit={(e) => e.preventDefault()}>
         <div className="grid grid-search">
           <div>
-            <label htmlFor="q" className="form-label fw-semibold">Search</label>
+            <label htmlFor="q" className="form-label fw-semibold">Search hospitals</label>
             <input id="q" className="form-control" value={q} onChange={(e) => setQ(e.target.value)} placeholder="e.g. cardiac Andheri, ICU Bandra" />
           </div>
           <div>

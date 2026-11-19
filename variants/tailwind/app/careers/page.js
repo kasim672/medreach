@@ -1,5 +1,6 @@
 "use client";
 
+import PublishedCareerRoles from "../../components/PublishedCareerRoles";
 import Link from "next/link";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { productApi, post } from "../../lib/productApi";
@@ -366,6 +367,8 @@ export default function Careers() {
         </div>
       </header>
 
+      <PublishedCareerRoles />
+      <h2>General expressions of interest</h2>
       {/* Search & Filter Control Bar */}
       <section className="surface mb-4 shadow-sm" aria-label="Search and Filter Organizations">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">

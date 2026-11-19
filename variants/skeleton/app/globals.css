@@ -228,14 +228,14 @@ select.w-auto { width: auto; display: inline-block; }
 .app-navbar .nav-link svg { flex-shrink: 0; transition: all 0.25s ease; }
 .app-navbar .nav-link:hover { background: #f1f6fc; color: #075a9f; }
 .app-navbar .nav-link.active { background: #e7f0ff; color: #0967b9; }
-.app-navbar .nav-login, .app-navbar .nav-logout { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 18px; border-radius: 999px; font-size: var(--type-body); font-weight: 600; text-decoration: none; white-space: nowrap; transition: all 0.25s ease; }
+.app-navbar .nav-login, .app-navbar .nav-profile { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 18px; border-radius: 999px; font-size: var(--type-body); font-weight: 600; text-decoration: none; white-space: nowrap; transition: all 0.25s ease; }
 .app-navbar .nav-login { background: #d32029; color: #fff; border: 1px solid #d32029; }
 .app-navbar .nav-login:hover { background: #ae1821; color: #fff; }
 .app-navbar .nav-login.is-scroll-hidden { visibility: hidden; pointer-events: none; }
-.app-navbar .nav-logout { background: #fff; color: #172b49; border: 1px solid #d6e3f0; }
-.app-navbar .nav-logout:hover { background: #f1f6fc; }
+.app-navbar .nav-profile { background: #fff; color: #172b49; border: 1px solid #d6e3f0; }
+.app-navbar .nav-profile:hover { background: #f1f6fc; }
 .app-navbar.is-scrolled .nav-link { font-size: 1.5rem; padding: 8px 10px; min-height: 40px; }
-.app-navbar.is-scrolled .nav-login, .app-navbar.is-scrolled .nav-logout { font-size: 1.5rem; min-height: 40px; padding: 8px 14px; }
+.app-navbar.is-scrolled .nav-login, .app-navbar.is-scrolled .nav-profile { font-size: 1.5rem; min-height: 40px; padding: 8px 14px; }
 .app-navbar .skeleton-account-links { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; border-top: 1px solid #e4edf6; padding-top: 10px; }
 .app-navbar a:focus-visible, .app-navbar button:focus-visible { outline: 3px solid #0967b9; outline-offset: 3px; }
 @media (min-width: 1400px) {
@@ -256,11 +256,11 @@ select.w-auto { width: auto; display: inline-block; }
   .app-navbar .skeleton-nav-links { flex-direction: row; align-items: center; gap: 2px; }
   .app-navbar .nav-link { padding: 8px 6px; gap: 6px; font-size: var(--type-body); }
   .app-navbar .nav-link svg { width: 22px; height: 22px; }
-  .app-navbar .nav-login, .app-navbar .nav-logout { font-size: var(--type-body); padding-inline: 16px; }
+  .app-navbar .nav-login, .app-navbar .nav-profile { font-size: var(--type-body); padding-inline: 16px; }
   .app-navbar .skeleton-account-links { grid-row: 2; justify-content: flex-end; margin-top: 10px; }
   .app-navbar.is-scrolled .nav-link { font-size: 1.5rem; padding: 6px 4px; gap: 4px; }
   .app-navbar.is-scrolled .nav-link svg { width: 20px; height: 20px; }
-  .app-navbar.is-scrolled .nav-login, .app-navbar.is-scrolled .nav-logout { font-size: 1.5rem; padding-inline: 12px; }
+  .app-navbar.is-scrolled .nav-login, .app-navbar.is-scrolled .nav-profile { font-size: 1.5rem; padding-inline: 12px; }
 }
 @media (max-width: 575px) {
   .app-navbar { padding: 8px; }
@@ -582,13 +582,12 @@ select.w-auto { width: auto; display: inline-block; }
 .skeleton-map-popup .skeleton-map-actions { padding-top: .8rem; margin-top: .8rem; border-top: 1px solid #dbeaf0; }
 
 /* Footer columns appear on the landing page only. */
-.skeleton-landing-footer-links { display: none; }
 
 /* Skeleton uses a 10px root scale; size desktop navigation accordingly. */
 @media (min-width: 1400px) {
   .app-navbar .nav-link { font-size: 1.4rem; padding-inline: 5px; gap: 4px; }
   .app-navbar .nav-link svg { width: 18px; height: 18px; }
-  .app-navbar .nav-login, .app-navbar .nav-logout { font-size: 1.4rem; padding-inline: 10px; }
+  .app-navbar .nav-login, .app-navbar .nav-profile { font-size: 1.4rem; padding-inline: 10px; }
 }
 
 /* Responsive dimensions change immediately; interaction feedback keeps motion. */
@@ -661,3 +660,5 @@ table { font-size: var(--type-small); line-height: 1.5; font-variant-numeric: ta
 @media (max-width: 767px) {
   #main :is(input, select, textarea):not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"], [type="hidden"], [type="button"], [type="submit"]) { font-size: var(--type-body); }
 }
+
+:root { --parity-primary: var(--color-emergency); }
