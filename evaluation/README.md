@@ -15,7 +15,7 @@ The hosted tools target:
 | Bootstrap | https://medreachmumbai.vercel.app |
 | Tailwind | https://medreach-tailwind.vercel.app |
 | Skeleton | https://medreach-skeleton.vercel.app |
-| Shared API | https://medreach-production.up.railway.app |
+| Shared API | https://medreach-backend.centralindia.cloudapp.azure.com |
 
 These tools do not connect to MongoDB, seed accounts, start local application
 servers, log in, submit healthcare requests or change deployment settings.

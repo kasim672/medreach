@@ -59,35 +59,35 @@ function system() {
   f.card(576,690,448,112,'Coordination',['Bed, blood & ambulance requests'],{titleSize:28,bodySize:22});
   f.card(1064,690,448,112,'Platform',['Accounts, Careers & assistant'],{titleSize:28,bodySize:22});
   f.rect(88,824,1424,108,{fill:C.wash,r:10});
-  f.text(112,864,'Background work runs inside the API process',{size:27,weight:700,color:C.ink,width:1368});
+  f.text(112,864,'Dedicated workers handle background work',{size:27,weight:700,color:C.ink,width:1368});
   f.text(112,903,'Request expiry · notification recovery · durable email delivery',{size:24,width:1368});
   f.path([[520,958],[520,1074]]);f.text(548,1028,'Mongoose / MongoDB',{size:23,width:460});
   f.path([[1288,958],[1288,1074]]);f.text(1315,1028,'Mail adapter',{size:22,width:220});
   f.card(64,1074,952,154,'One shared MongoDB dataset',['Providers · accounts · requests · Careers · audit and delivery state','Existing records and historical provenance remain intact.'],{bodySize:23,fill:C.pale});
   f.card(1080,1074,456,154,'Resend / SMTP',['Configured email transport','Acceptance ≠ inbox receipt'],{titleSize:29,bodySize:22});
-  return f.finish('Read with backend/src/app.js and server.js · No separate crawler, Redis queue or worker deployment is required.');
+  return f.finish('Read with backend/src/app.js, backend/src/server.js and backend/operations/azure.');
 }
 
 function deployment() {
-  const f=new Figure('deployment-architecture','Cloud deployment & trust boundaries','Three public Vercel deployments connect to one Railway API and one Atlas dataset.',1390);
+  const f=new Figure('deployment-architecture','Cloud deployment & trust boundaries','Three public Vercel deployments connect to one Azure VM with local MongoDB.',1390);
   f.rect(64,202,1472,90,{fill:C.pale});f.text(88,238,'BROWSER / MOBILE',{size:21,weight:700,color:C.teal,width:1350});
   f.text(88,272,'Public discovery · regular users · Provider Admins · System Admins',{size:27,color:C.ink,width:1400});
   f.path([[800,292],[800,364]]);f.text(830,340,'HTTPS',{size:23,width:300});
   f.rect(64,364,1472,274,{fill:C.pale});f.section(88,404,'VERCEL  /  INDEPENDENT FRONTEND PROJECTS');
-  [['Bootstrap','medreachmumbai.vercel.app'],['Tailwind','medreach-tailwind.vercel.app'],['Skeleton','medreach-skeleton.vercel.app']].forEach(([name,url],i)=>f.card(88+i*488,428,448,184,name,[url,'NEXT_PUBLIC_API_URL','points to the same Railway API'],{titleSize:30,bodySize:22}));
+  [['Bootstrap','medreachmumbai.vercel.app'],['Tailwind','medreach-tailwind.vercel.app'],['Skeleton','medreach-skeleton.vercel.app']].forEach(([name,url],i)=>f.card(88+i*488,428,448,184,name,[url,'NEXT_PUBLIC_API_URL','points to the same Azure API'],{titleSize:30,bodySize:22}));
   f.path([[552,638],[552,754]]);f.text(580,700,'Browser-to-API HTTPS',{size:24,width:560});f.text(580,730,'Named CORS origins + cookies',{size:22,width:560});
   f.path([[1320,638],[1320,754]]);f.text(1348,702,'Browser SDK',{size:22,width:186});
-  f.card(64,754,976,292,'Railway · one backend service',['medreach-production.up.railway.app','Express REST API + in-process workers','Readiness: /health/ready','Startup: node backend/src/server.js','Server-only credentials stay here.'],{titleSize:32,bodySize:25,fill:C.wash});
+  f.card(64,754,976,292,'Azure · Central India VM',['medreach-backend.centralindia.cloudapp.azure.com','Express API + three systemd workers','Readiness: /health/ready','Startup: node backend/src/server.js','Server-only credentials stay here.'],{titleSize:32,bodySize:25,fill:C.wash});
   f.card(1104,754,432,142,'Google Maps',['Maps and location UI'],{titleSize:29,bodySize:23});
   f.card(1104,926,432,158,'Resend / SMTP',['Server-side email transport','Selected by configuration'],{titleSize:29,bodySize:22});
   f.path([[1040,1006],[1104,1006]]);
-  f.path([[552,1046],[552,1164]]);f.text(580,1117,'MONGODB_URI · TLS',{size:24,width:600});
-  f.card(64,1164,976,144,'MongoDB Atlas · shared application data',['Provider records, accounts, requests, Careers and delivery state'],{titleSize:32,bodySize:24,fill:C.pale});
+  f.path([[552,1046],[552,1164]]);f.text(580,1117,'MongoDB · authenticated loopback',{size:24,width:600});
+  f.card(64,1164,976,144,'MongoDB replica set · shared application data',['Provider records, accounts, requests, Careers and delivery state'],{titleSize:32,bodySize:24,fill:C.pale});
   f.text(1104,1174,'PUBLIC CONFIG',{size:20,weight:700,color:C.teal,width:420});
   f.text(1104,1212,'API URL + restricted Maps key',{size:23,width:420});
   f.text(1104,1255,'PRIVATE CONFIG',{size:20,weight:700,color:C.teal,width:420});
   f.text(1104,1293,'DB, JWT and mail credentials',{size:23,width:420});
-  return f.finish('Topology documents the selected hosting arrangement; it does not assert cluster tier, region or replica count.');
+  return f.finish('API, workers and the single-member MongoDB replica set run on the same Azure VM.');
 }
 
 function careData() {

@@ -4,18 +4,11 @@ These are reviewable deployment templates, not an installed or approved producti
 
 ## Code and environment
 
-Use one reviewed, pinned code revision for the API and all workers. Four Railway configuration templates share the repository/build:
-
-| Role | Template | Proposed replicas | Readiness |
-| --- | --- | ---: | --- |
-| API | `api.railway.json` | 2 | `/health/ready` |
-| Notification worker | `notification.railway.json` | 2 | persisted worker heartbeat, queue and incident checks |
-| Request expiry | `expiry.railway.json` | 1 | persisted worker heartbeat and expiry journal checks |
-| Recovery | `recovery.railway.json` | 1 | persisted worker heartbeat and recovery jobs |
-
-Replica counts are a staging proposal, not a cost approval or capacity commitment. Workers have no HTTP readiness server. Their supervision must monitor process status plus the API's protected worker/queue health; do not point a worker at an API-only HTTP health URL.
-
-Read-only Railway inspection on 27 October 2026 showed one API replica in `sfo`, started by `node backend/src/server.js`, with `/health/ready` configured. Atlas's region is still unverified. The supplied Railway link cannot establish the MongoDB region. Verify Atlas cluster region/tier and the API's actual connection waiting before choosing a shared target near users. Templates deliberately do not invent an approved region.
+Use one reviewed, pinned code revision for the API and all workers on the Azure VM.
+The [Azure runbook](../azure/README.md) describes the current deployment.
+The four systemd role instances share one service template and configuration.
+The API readiness endpoint is `/health/ready`. Use process status and persisted
+worker heartbeats for the worker roles.
 
 Provide secrets through the platform secret manager, never these files. Each API/worker needs its reviewed MongoDB, session and applicable notification-encryption configuration. Give the extraction provider key/model only to recovery workers when enabling that optional workflow. Public reads do not need an external AI call. Reserve key material needed to decrypt restored queued emails and backups in separately protected recovery custody; a new backup encryption key does not replace the email-envelope key.
 

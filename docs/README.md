@@ -14,7 +14,7 @@ operational instructions, dated verification and proposed research.
 | Understand the implementation | [Architecture and code map](architecture.md) · [Diagram Gallery](diagrams/README.md) |
 | Find an endpoint or permission boundary | [API reference](api.md), [security](security.md) |
 | Understand MongoDB records and relationships | [Database Schema & Dictionary](database-schema.md) · [Data model](data-model.md) · [Stored dataset](stored-data.md) |
-| Deploy the existing stack or configure email | [Vercel, Railway, Atlas and email](deployment.md) |
+| Deploy the existing stack or configure email | [Vercel, Azure, MongoDB and email](deployment.md) |
 | Run tests safely or inspect actual results | [Testing guide](testing.md) · [Release verification](release-qa.md) |
 | Understand speed improvements | [Performance evidence](latency-verification.md) |
 | Review the interface | [Current screenshots and capture method](screenshots/README.md) |

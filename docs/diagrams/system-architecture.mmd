@@ -7,12 +7,12 @@ flowchart TB
     C[Shared client contracts: API, hooks, validation, ranking]
   end
   Frontends -->|Browser HTTPS / JSON| API
-  subgraph API[One Express backend process]
+  subgraph API[Express API and dedicated workers]
     Security[Sessions, role / organisation scope, validation, rate limits]
     Domains[Discovery · healthcare requests · Careers · accounts · assistant]
     Workers[Expiry · notification recovery · email delivery workers]
     Security --> Domains
-    Domains --> Workers
+    Domains -.->|Durable jobs| Workers
   end
   API <-->|Mongoose / MongoDB| DB[(One shared dataset)]
   Workers -->|Configured mail adapter| Mail[Resend or SMTP]

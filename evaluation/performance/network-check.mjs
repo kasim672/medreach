@@ -17,7 +17,7 @@ try {
     let phase='observation';
     const row={variant,profile,route,status:null,failures:[],apiResponses:[],runtimeErrors:0};
     page.on('requestfailed',request=>{if(['GET','HEAD'].includes(request.method()))row.failures.push({url:clean(request.url()),reason:request.failure()?.errorText?.match(/net::[A-Z_]+/)?.[0]||'unknown',phase});});
-    page.on('response',response=>{if(new URL(response.url()).origin==='https://medreach-production.up.railway.app')row.apiResponses.push({url:clean(response.url()),status:response.status()});});
+    page.on('response',response=>{if(new URL(response.url()).origin==='https://medreach-backend.centralindia.cloudapp.azure.com')row.apiResponses.push({url:clean(response.url()),status:response.status()});});
     page.on('pageerror',()=>row.runtimeErrors++);
     try{const response=await page.goto(base+route,{waitUntil:'load',timeout:45000});row.status=response?.status();await page.waitForTimeout(8000);}catch(error){row.errorType=error.name;}
     phase='cleanup';await context.close();report.observations.push(row);

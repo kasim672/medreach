@@ -37,7 +37,7 @@
 <text x="1088" y="754" fill="#12384A" font-size="28" font-weight="700" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="400">Platform</text>
 <text x="1088" y="792" fill="#4B6575" font-size="22" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="400">Accounts, Careers &amp; assistant</text>
 <rect x="88" y="824" width="1424" height="108" rx="10" fill="#EAF5F5" stroke="#CCDCE5" stroke-width="2"/>
-<text x="112" y="864" fill="#12384A" font-size="27" font-weight="700" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="1368">Background work runs inside the API process</text>
+<text x="112" y="864" fill="#12384A" font-size="27" font-weight="700" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="1368">Dedicated workers handle background work</text>
 <text x="112" y="903" fill="#4B6575" font-size="24" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="1368">Request expiry · notification recovery · durable email delivery</text>
 <path d="M520 958 L520 1074" fill="none" stroke="#087D8E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"  marker-end="url(#arrow)"/>
 <text x="548" y="1028" fill="#4B6575" font-size="23" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="460">Mongoose / MongoDB</text>
@@ -54,4 +54,4 @@
 <text x="1104" y="1176" fill="#4B6575" font-size="22" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="408">Configured email transport</text>
 <text x="1104" y="1209" fill="#4B6575" font-size="22" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="408">Acceptance ≠ inbox receipt</text>
 <path d="M64 1246 L1536 1246" fill="none" stroke="#CCDCE5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"  />
-<text x="64" y="1283" fill="#4B6575" font-size="20" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="1472">Read with backend/src/app.js and server.js · No separate crawler, Redis queue or worker deployment is required.</text></svg>
+<text x="64" y="1283" fill="#4B6575" font-size="20" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="1472">Read with backend/src/app.js, backend/src/server.js and backend/operations/azure.</text></svg>

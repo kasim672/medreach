@@ -1,0 +1,4 @@
+# Set the API hostname for the target environment.
+medreach-backend.centralindia.cloudapp.azure.com {
+    reverse_proxy 127.0.0.1:4000
+}

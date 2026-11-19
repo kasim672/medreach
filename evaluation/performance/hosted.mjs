@@ -12,7 +12,7 @@ const targets = {
   tailwind: 'https://medreach-tailwind.vercel.app',
   skeleton: 'https://medreach-skeleton.vercel.app',
 };
-const api = 'https://medreach-production.up.railway.app';
+const api = 'https://medreach-backend.centralindia.cloudapp.azure.com';
 const routes = ['/', '/hospitals', '/emergency', '/blood-banks', '/diagnostics', '/ambulances', '/careers', '/map', '/track', '/login'];
 const profiles = {
   desktop: { viewport: { width: 1440, height: 900 }, cpuRate: 1, latencyMs: 0, downloadBytesPerSecond: -1, uploadBytesPerSecond: -1 },

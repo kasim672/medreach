@@ -1,4 +1,4 @@
-# Merge into the packaged MongoDB configuration on the NEW Oracle host.
+# Merge into the packaged MongoDB configuration on the NEW Azure host.
 storage:
   dbPath: /var/lib/mongodb
 systemLog:

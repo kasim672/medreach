@@ -17,7 +17,7 @@ Development and production use MongoDB atomic counters shared by every API repli
 
 Login email validation runs before the account limiter; equivalent uppercase/lowercase addresses share a bucket. Nonexistent addresses receive the same budget and invalid-credential response. The authenticated credential budget is shared across password and MFA routes, so changing endpoint or IP cannot reset it.
 
-`TRUST_PROXY` defaults to false. Do not set unrestricted trust or accept a client-selected header as an IP. Verify the actual ingress boundary before changing proxy settings. On a hosted reverse proxy, the conservative default can group several clients under a gateway IP. Account limits remain independent of this limitation. See [Express proxy guidance](https://expressjs.com/en/guide/behind-proxies/) and [Railway networking specifications](https://docs.railway.com/networking/public-networking/specs-and-limits).
+`TRUST_PROXY` defaults to false. Do not set unrestricted trust or accept a client-selected header as an IP. Verify the actual ingress boundary before changing proxy settings. On a hosted reverse proxy, the conservative default can group several clients under a gateway IP. Account limits remain independent of this limitation. See [Express proxy guidance](https://expressjs.com/en/guide/behind-proxies/).
 
 ## Input and password handling
 

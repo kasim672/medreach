@@ -129,7 +129,7 @@ receive a copy of that private database from Git.
 
 ## Architecture
 
-**Three independent frontends. One shared backend. One Atlas dataset.**
+**Three independent frontends. One shared backend. One MongoDB dataset.**
 
 The diagrams below show different views of the same application: code and
 runtime boundaries, cloud deployment, and the data relationships behind care
@@ -137,18 +137,18 @@ coordination. Open any figure for its full-size SVG.
 
 ### System topology
 
-[![MedReach system topology: three Next.js frontends, shared client contracts, one Express API with in-process workers, MongoDB and configured email transport](docs/diagrams/system-architecture.png)](docs/diagrams/system-architecture.svg)
+[![MedReach system topology: three Next.js frontends, shared client contracts, one Express API with separate workers, MongoDB and configured email transport](docs/diagrams/system-architecture.png)](docs/diagrams/system-architecture.svg)
 
 Each frontend keeps its own presentation layer. The API owns authentication,
 organisation-scoped permissions and healthcare workflows. Request expiry,
-notification recovery and email delivery run inside that backend process.
+notification recovery and email delivery run as separate worker processes.
 
 ### Cloud deployment
 
-[![MedReach cloud deployment: three Vercel projects call one Railway API connected to MongoDB Atlas; browser Maps and backend mail have separate boundaries](docs/diagrams/deployment-architecture.png)](docs/diagrams/deployment-architecture.svg)
+[![MedReach cloud deployment: three Vercel projects call one Azure VM running the API and MongoDB; browser Maps and backend mail have separate boundaries](docs/diagrams/deployment-architecture.png)](docs/diagrams/deployment-architecture.svg)
 
-Vercel serves the frontends; browsers call the Railway API over HTTPS. The API
-connects to Atlas and the configured Resend/SMTP transport. Database, JWT and
+Vercel serves the frontends; browsers call the Azure API over HTTPS. The API
+connects to MongoDB on the VM and the configured Resend/SMTP transport. Database, JWT and
 mail credentials stay on the backend. Google Maps is a browser integration.
 
 ### Database model
@@ -235,7 +235,7 @@ Start with the [documentation hub](docs/README.md), organised by task.
 | --- | --- | --- |
 | `EADDRINUSE: address already in use :::3000` (or `4000`) | A prior process is holding the frontend or backend port. | Stop the previous launcher with `Ctrl+C`. Inspect the port owner before stopping another process; use one frontend if that is all you need. |
 | `MongooseServerSelectionError: connect ECONNREFUSED 127.0.0.1:27017` | Local MongoDB daemon is not running. | Check the configured MongoDB service and [local setup](LOCAL_MONGODB_SETUP.md). Preserve the existing data directory; starting a different empty database will not recover the records. |
-| `/api/auth/me` returns `401` | Expected for a signed-out visitor; a signed-in failure can involve expired sessions or blocked cookies. | For a failed login, check the [deployment cookie/CORS guidance](docs/deployment.md). Vercel/Railway cross-site cookies require different settings from localhost. |
+| `/api/auth/me` returns `401` | Expected for a signed-out visitor; a signed-in failure can involve expired sessions or blocked cookies. | For a failed login, check the [deployment cookie/CORS guidance](docs/deployment.md). Vercel/Azure cross-site cookies require different settings from localhost. |
 | Stale styles or missing client modules after branch switch | Next.js build cache discrepancy. | Stop the affected frontend, check its build configuration, and rebuild that variant. See the [frontend guide](variants/README.md). |
 | Map fails to load or shows grey container | Missing or restricted Google Maps API key. | MedReach provides an honest list fallback without an active key. Supply `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` in `.env.local` if map rendering is required. |
 

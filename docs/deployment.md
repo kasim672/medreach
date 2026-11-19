@@ -2,7 +2,7 @@
 
 [Documentation](README.md) · [Project overview](../README.md)
 
-Selected stack: Vercel frontends → Railway Express API → MongoDB Atlas.
+Selected stack: Vercel frontends → Azure Express API → MongoDB on the Azure VM.
 This guide describes manual deployment; it does not claim a deployment was
 performed or verified.
 
@@ -33,17 +33,18 @@ Do not point cloud services at this local path.
   available and the map displays its fallback.
 - Rebuild when changing `NEXT_PUBLIC_*`; these values are embedded in JavaScript.
 
-## Railway: shared API
+## Azure: shared API
 
-Use the repository root and `/backend/railway.json`. The checked-in configuration
-starts `node backend/src/server.js`, uses `/health/ready`, one replica and a
-35-second drain period. The process requires a persistent service to run expiry,
-notification recovery and email outbox workers.
+The active VM is `medreach-backend` in Central India. Caddy provides HTTPS
+at `https://medreach-backend.centralindia.cloudapp.azure.com`. systemd
+supervises Express and the notification, expiry and recovery worker processes.
+Follow the [VM runbook](../backend/operations/azure/README.md) for deployment and
+verification. Keep MongoDB and port 4000 private.
 
 | Variable | Purpose |
 | --- | --- |
 | `NODE_ENV=production` | Production validation/security |
-| `MONGODB_URI` | Atlas URI including the intended database name; takes precedence over `MONGO_URI` |
+| `MONGODB_URI` | Authenticated loopback replica-set URI including the intended database name; takes precedence over `MONGO_URI` |
 | `JWT_SECRET` | Unique random secret of at least 32 characters |
 | `PUBLIC_APP_URL` | Canonical frontend HTTPS origin for email links |
 | `CORS_ORIGINS` | Comma-separated exact approved frontend origins |
@@ -80,7 +81,7 @@ The host must permit outbound connections to the chosen SMTP service.
 
 ### Delivery semantics
 
-The normal server starts the persistent email outbox automatically. Only new
+The notification worker processes the persistent email outbox. Only new
 explicitly queued, replay-safe messages are picked up; historical delivery rows
 are not broadly replayed. Failed definitive attempts have bounded recovery.
 Ambiguous acceptance is marked uncertain and is not automatically resent.
@@ -89,7 +90,7 @@ Account links remain inline and non-replayable.
 Changing `JWT_SECRET` affects sessions, guest token recovery and encrypted
 email retry envelopes. Treat rotation as a separate migration/recovery decision.
 
-## Atlas and data safety
+## Data safety
 
 Use a restricted database user and appropriate network access rules.
 `DATABASE_URL` is not a MongoDB alias in this application.

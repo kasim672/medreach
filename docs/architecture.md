@@ -16,7 +16,7 @@ organisation checks, database access and worker lifecycle.
 | View | Diagram and detail |
 | --- | --- |
 | Runtime components | [System topology](diagrams/README.md#system-topology) |
-| Hosting and trust boundaries | [Vercel → Railway → Atlas](diagrams/README.md#cloud-deployment) |
+| Hosting and trust boundaries | [Vercel → Azure VM → MongoDB](diagrams/README.md#cloud-deployment) |
 | Care and Careers references | [Core ER view](diagrams/README.md#care-and-careers-data) |
 | Identity and organisation ownership | [Account / provider-scope ER view](diagrams/README.md#accounts-and-provider-scope) |
 | Detailed workflows | [Roles, onboarding, notifications and authentication](diagrams/README.md#role-and-workflow-reference-views) |

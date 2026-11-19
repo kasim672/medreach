@@ -7,14 +7,15 @@ flowchart TB
     S[medreach-skeleton.vercel.app]
   end
   Browser -->|HTTPS| Vercel
-  Vercel -->|Browser-to-API HTTPS / named CORS origins| Railway
+  Vercel -->|Browser-to-API HTTPS / named CORS origins| Azure
   Vercel -->|Browser SDK| Maps[Google Maps]
-  subgraph Railway[Railway · one backend service]
+  subgraph Azure[Azure · one VM]
     API[Express API · backend/src/server.js]
-    Workers[In-process expiry, recovery and email workers]
+    Workers[Systemd expiry, recovery and notification workers]
     Ready[Readiness: /health/ready]
     API --- Workers
     API --- Ready
+    Mongo[(Authenticated local MongoDB replica set)]
+    API <-->|Loopback| Mongo
   end
-  Railway <-->|MONGODB_URI · TLS| Atlas[(MongoDB Atlas · one shared dataset)]
   Workers --> Mail[Resend or configured SMTP]

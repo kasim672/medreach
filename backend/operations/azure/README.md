@@ -1,18 +1,21 @@
-# Oracle deployment
+# Azure deployment
 
-Prepared configuration. Live provisioning and restore remain pending Oracle
-account access, VM availability, database inventory and an API hostname.
+Production uses the Central India Ubuntu 24.04 VM `medreach-backend`
+(Standard B2als_v2, 2 vCPUs, 4 GiB RAM). All three Vercel frontends share
+[the HTTPS API](https://medreach-backend.centralindia.cloudapp.azure.com).
+Caddy proxies requests to Express. The API and each of the three workers run
+as separate systemd services. MongoDB runs as an authenticated, single-member
+replica set on the same VM and listens on loopback.
+
+The tested VM still runs a pinned revision from before this directory was
+renamed. Install the updated systemd template before restarting services after
+updating its checkout. After merging to main, the VM still needs its own
+reviewed software update. GitHub and Vercel deployments do not update the VM.
 
 ## VM and networking
 
-Create an Always Free eligible Ubuntu 24.04 A1 VM in the account's home region,
-preferably Mumbai when capacity permits. Select 2 OCPUs and 12 GB RAM within the
-published free allowance. Keep aggregate boot/data volumes within 200 GB.
-Confirm the console's price estimate and Always Free eligibility before creation.
-Oracle can reclaim idle instances. Keep encrypted backups outside this VM.
-
-Allow inbound TCP 80/443 and restrict SSH to the operator's IP in both OCI
-network rules and the host firewall. Keep ports 4000 and 27017 inaccessible
+Allow inbound TCP 80/443 and restrict SSH to the operator's IP in both Azure
+network security group and the host firewall. Keep ports 4000 and 27017 inaccessible
 from the internet. Point an owned API hostname to the VM's public IP.
 
 Install Git, a supported system-wide Node release >=22.19.0 at `/usr/bin/node`,
@@ -105,6 +108,6 @@ alone must not send users to a stale database.
 
 ## References
 
-- https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm
+- https://learn.microsoft.com/en-us/azure/virtual-machines/linux/quick-create-portal
 - https://www.mongodb.com/docs/manual/administration/production-notes/
 - https://www.mongodb.com/docs/manual/tutorial/deploy-replica-set-with-keyfile-access-control/

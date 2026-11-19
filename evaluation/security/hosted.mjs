@@ -2,7 +2,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 const targets={bootstrap:'https://medreachmumbai.vercel.app',tailwind:'https://medreach-tailwind.vercel.app',skeleton:'https://medreach-skeleton.vercel.app'};
-const api='https://medreach-production.up.railway.app';
+const api='https://medreach-backend.centralindia.cloudapp.azure.com';
 const headers=['strict-transport-security','content-security-policy','x-frame-options','x-content-type-options','referrer-policy','permissions-policy'];
 const evidence={generatedAt:new Date().toISOString(),scope:'Passive unauthenticated GETs only; no exploit, authentication, tenant-isolation, TLS-configuration or Atlas-configuration testing',frontends:[],cors:[],protectedEndpoints:[]};
 async function get(url,origin) {

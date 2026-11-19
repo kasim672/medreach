@@ -18,7 +18,7 @@ const lines=[
   '# Hosted MedReach evaluation', '', '[Evaluation guide](README.md) · [Project overview](../README.md)', '',
   `Repeated navigation measurements collected **${hosted.startedAt} → ${hosted.finishedAt}**. The measurement tooling is based on repository revision \`${hosted.sourceCommit.slice(0,7)}\` plus the local evaluation changes. Deployed revisions were not independently identified.`, '',
   '## Scope', '',
-  'Bootstrap, Tailwind and Skeleton were evaluated at their public Vercel URLs, using the shared Railway API. The owner reports one Atlas database. No direct Atlas access, database changes, account modifications, healthcare submissions, notifications or local application-server measurements were performed.', '',
+  'Bootstrap, Tailwind and Skeleton were evaluated at their public Vercel URLs using the shared API. The measurements covered public pages and read-only API calls.', '',
   ...Object.entries(hosted.targets).map(([name,url])=>`- **${name}:** ${url}`),
   `- **Shared API:** ${hosted.api}`, '',
   `The repeated browser run used ${hosted.observations.length} public page visits: ten routes × three variants × two profiles × three samples. Chrome ${hosted.environment.browser}; ${hosted.environment.platform}/${hosted.environment.arch}; Node ${hosted.environment.node}.`, '',
@@ -91,7 +91,7 @@ if(existsSync(diagnosticsPath)) {
     `- Failures before closing: **${failures.filter(r=>r.phase==='observation').length}**.`,
     `- Failures during test cleanup: **${failures.filter(r=>r.phase==='cleanup').length}**.`,
     `- Recorded browser reasons: ${[...new Set(failures.map(r=>r.reason))].join(', ') || 'none'}.`,
-    `- Unexpected Railway HTTP errors during this follow-up: **${apiFailures.length}**.`,
+    `- Unexpected shared API HTTP errors during this follow-up: **${apiFailures.length}**.`,
     'The observed aborts were hospital detail-page requests in desktop directory views. This is consistent with client prefetch cancellation; it does not establish a provider API outage.',
     'Client aborts and cleanup cancellations do not by themselves establish a service outage. This follow-up does not retroactively classify every event in the first run.', '');
 }

@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1390" viewBox="0 0 1600 1390" role="img" aria-labelledby="title desc"><title id="title">Cloud deployment &amp; trust boundaries</title><desc id="desc">Three public Vercel deployments connect to one Railway API and one Atlas dataset.</desc><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9" fill="none" stroke="#087D8E" stroke-width="1.5"/></marker></defs><rect width="1600" height="1390" fill="white"/><rect x="1" y="1" width="1598" height="1388" fill="none" stroke="#CCDCE5"/><path d="M64 46 H112" stroke="#087D8E" stroke-width="6"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1390" viewBox="0 0 1600 1390" role="img" aria-labelledby="title desc"><title id="title">Cloud deployment &amp; trust boundaries</title><desc id="desc">Three public Vercel deployments connect to one Azure VM with local MongoDB.</desc><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9" fill="none" stroke="#087D8E" stroke-width="1.5"/></marker></defs><rect width="1600" height="1390" fill="white"/><rect x="1" y="1" width="1598" height="1388" fill="none" stroke="#CCDCE5"/><path d="M64 46 H112" stroke="#087D8E" stroke-width="6"/>
 <text x="132" y="53" fill="#087D8E" font-size="20" font-weight="700" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="1000">MEDREACH  /  ENGINEERING</text>
 <text x="64" y="116" fill="#12384A" font-size="44" font-weight="700" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="1472">Cloud deployment &amp; trust boundaries</text>
-<text x="64" y="160" fill="#4B6575" font-size="25" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="1472">Three public Vercel deployments connect to one Railway API and one Atlas dataset.</text>
+<text x="64" y="160" fill="#4B6575" font-size="25" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="1472">Three public Vercel deployments connect to one Azure VM with local MongoDB.</text>
 <rect x="64" y="202" width="1472" height="90" rx="14" fill="#F3F8FB" stroke="#CCDCE5" stroke-width="2"/>
 <text x="88" y="238" fill="#087D8E" font-size="21" font-weight="700" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="1350">BROWSER / MOBILE</text>
 <text x="88" y="272" fill="#12384A" font-size="27" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="1400">Public discovery · regular users · Provider Admins · System Admins</text>
@@ -14,19 +14,19 @@
 <text x="112" y="492" fill="#12384A" font-size="30" font-weight="700" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="400">Bootstrap</text>
 <text x="112" y="530" fill="#4B6575" font-size="22" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="400">medreachmumbai.vercel.app</text>
 <text x="112" y="563" fill="#4B6575" font-size="22" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="400">NEXT_PUBLIC_API_URL</text>
-<text x="112" y="596" fill="#4B6575" font-size="22" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="400">points to the same Railway API</text>
+<text x="112" y="596" fill="#4B6575" font-size="22" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="400">points to the same Azure API</text>
 <rect x="576" y="428" width="448" height="184" rx="14" fill="#FFFFFF" stroke="#CCDCE5" stroke-width="2"/>
 <path d="M600 450 H634" stroke="#087D8E" stroke-width="5" stroke-linecap="round"/>
 <text x="600" y="492" fill="#12384A" font-size="30" font-weight="700" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="400">Tailwind</text>
 <text x="600" y="530" fill="#4B6575" font-size="22" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="400">medreach-tailwind.vercel.app</text>
 <text x="600" y="563" fill="#4B6575" font-size="22" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="400">NEXT_PUBLIC_API_URL</text>
-<text x="600" y="596" fill="#4B6575" font-size="22" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="400">points to the same Railway API</text>
+<text x="600" y="596" fill="#4B6575" font-size="22" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="400">points to the same Azure API</text>
 <rect x="1064" y="428" width="448" height="184" rx="14" fill="#FFFFFF" stroke="#CCDCE5" stroke-width="2"/>
 <path d="M1088 450 H1122" stroke="#087D8E" stroke-width="5" stroke-linecap="round"/>
 <text x="1088" y="492" fill="#12384A" font-size="30" font-weight="700" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="400">Skeleton</text>
 <text x="1088" y="530" fill="#4B6575" font-size="22" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="400">medreach-skeleton.vercel.app</text>
 <text x="1088" y="563" fill="#4B6575" font-size="22" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="400">NEXT_PUBLIC_API_URL</text>
-<text x="1088" y="596" fill="#4B6575" font-size="22" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="400">points to the same Railway API</text>
+<text x="1088" y="596" fill="#4B6575" font-size="22" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="400">points to the same Azure API</text>
 <path d="M552 638 L552 754" fill="none" stroke="#087D8E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"  marker-end="url(#arrow)"/>
 <text x="580" y="700" fill="#4B6575" font-size="24" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="560">Browser-to-API HTTPS</text>
 <text x="580" y="730" fill="#4B6575" font-size="22" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="560">Named CORS origins + cookies</text>
@@ -34,9 +34,9 @@
 <text x="1348" y="702" fill="#4B6575" font-size="22" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="186">Browser SDK</text>
 <rect x="64" y="754" width="976" height="292" rx="14" fill="#EAF5F5" stroke="#CCDCE5" stroke-width="2"/>
 <path d="M88 776 H122" stroke="#087D8E" stroke-width="5" stroke-linecap="round"/>
-<text x="88" y="818" fill="#12384A" font-size="32" font-weight="700" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="928">Railway · one backend service</text>
-<text x="88" y="856" fill="#4B6575" font-size="25" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="928">medreach-production.up.railway.app</text>
-<text x="88" y="889" fill="#4B6575" font-size="25" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="928">Express REST API + in-process workers</text>
+<text x="88" y="818" fill="#12384A" font-size="32" font-weight="700" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="928">Azure · Central India VM</text>
+<text x="88" y="856" fill="#4B6575" font-size="25" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="928">medreach-backend.centralindia.cloudapp.azure.com</text>
+<text x="88" y="889" fill="#4B6575" font-size="25" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="928">Express API + three systemd workers</text>
 <text x="88" y="922" fill="#4B6575" font-size="25" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="928">Readiness: /health/ready</text>
 <text x="88" y="955" fill="#4B6575" font-size="25" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="928">Startup: node backend/src/server.js</text>
 <text x="88" y="988" fill="#4B6575" font-size="25" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="928">Server-only credentials stay here.</text>
@@ -51,14 +51,14 @@
 <text x="1128" y="1061" fill="#4B6575" font-size="22" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="384">Selected by configuration</text>
 <path d="M1040 1006 L1104 1006" fill="none" stroke="#087D8E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"  marker-end="url(#arrow)"/>
 <path d="M552 1046 L552 1164" fill="none" stroke="#087D8E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"  marker-end="url(#arrow)"/>
-<text x="580" y="1117" fill="#4B6575" font-size="24" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="600">MONGODB_URI · TLS</text>
+<text x="580" y="1117" fill="#4B6575" font-size="24" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="600">MongoDB · authenticated loopback</text>
 <rect x="64" y="1164" width="976" height="144" rx="14" fill="#F3F8FB" stroke="#CCDCE5" stroke-width="2"/>
 <path d="M88 1186 H122" stroke="#087D8E" stroke-width="5" stroke-linecap="round"/>
-<text x="88" y="1228" fill="#12384A" font-size="32" font-weight="700" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="928">MongoDB Atlas · shared application data</text>
+<text x="88" y="1228" fill="#12384A" font-size="32" font-weight="700" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="928">MongoDB replica set · shared application data</text>
 <text x="88" y="1266" fill="#4B6575" font-size="24" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="928">Provider records, accounts, requests, Careers and delivery state</text>
 <text x="1104" y="1174" fill="#087D8E" font-size="20" font-weight="700" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="420">PUBLIC CONFIG</text>
 <text x="1104" y="1212" fill="#4B6575" font-size="23" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="420">API URL + restricted Maps key</text>
 <text x="1104" y="1255" fill="#087D8E" font-size="20" font-weight="700" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="420">PRIVATE CONFIG</text>
 <text x="1104" y="1293" fill="#4B6575" font-size="23" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="420">DB, JWT and mail credentials</text>
 <path d="M64 1326 L1536 1326" fill="none" stroke="#CCDCE5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"  />
-<text x="64" y="1363" fill="#4B6575" font-size="20" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="1472">Topology documents the selected hosting arrangement; it does not assert cluster tier, region or replica count.</text></svg>
+<text x="64" y="1363" fill="#4B6575" font-size="20" font-weight="400" font-family="Arial, Helvetica, sans-serif" text-anchor="start" data-max-width="1472">API, workers and the single-member MongoDB replica set run on the same Azure VM.</text></svg>

@@ -9,7 +9,7 @@ a thumbnail grid. PNG previews work directly in GitHub; SVGs open at any zoom.
 | View | What it answers | Open separately |
 | --- | --- | --- |
 | [System topology](#system-topology) | What is shared, and where does code run? | [SVG](system-architecture.svg) · [PNG](system-architecture.png) |
-| [Cloud deployment](#cloud-deployment) | How do Vercel, Railway, Atlas and external services connect? | [SVG](deployment-architecture.svg) · [PNG](deployment-architecture.png) |
+| [Cloud deployment](#cloud-deployment) | How do Vercel, Azure, MongoDB and external services connect? | [SVG](deployment-architecture.svg) · [PNG](deployment-architecture.png) |
 | [Care and Careers data](#care-and-careers-data) | Which organisations receive requests and applications? | [SVG](database-er.svg) · [PNG](database-er.png) |
 | [Accounts and provider scope](#accounts-and-provider-scope) | How do identity, assignments and onboarding relate? | [SVG](database-access-er.svg) · [PNG](database-access-er.png) |
 
@@ -17,12 +17,12 @@ a thumbnail grid. PNG previews work directly in GitHub; SVGs open at any zoom.
 
 <a id="1-system-architecture"></a>
 
-[![System topology: three independent Next.js frontends share one Express API, in-process workers and one MongoDB dataset](system-architecture.png)](system-architecture.svg)
+[![System topology: three independent Next.js frontends share one Express API, separate workers and one MongoDB dataset](system-architecture.png)](system-architecture.svg)
 
 The shared client is **build-time application code**, not a fourth hosted
 frontend or a gateway service. Bootstrap uses its local `_core` mirror;
 Tailwind and Skeleton resolve the workspace package. All three call the same
-API. Its workers run inside the API process.
+API. Its workers run as separate systemd services.
 
 Evidence: [`app.js`](../../backend/src/app.js),
 [`server.js`](../../backend/src/server.js),
@@ -33,18 +33,17 @@ Evidence: [`app.js`](../../backend/src/app.js),
 
 <a id="6-deployment-architecture"></a>
 
-[![Cloud deployment: three Vercel projects, one Railway backend and one Atlas dataset, with browser Maps access and server-side email](deployment-architecture.png)](deployment-architecture.svg)
+[![Cloud deployment: three Vercel projects, one Azure VM with the API and MongoDB, with browser Maps access and server-side email](deployment-architecture.png)](deployment-architecture.svg)
 
-The frontend calls the Railway API from the browser; the diagram does not imply
+The frontend calls the Azure API from the browser; the diagram does not imply
 an additional Vercel API proxy. MongoDB and mail credentials belong on the
 backend. The browser receives the public API URL and its restricted Maps key.
 Resend and SMTP are alternative configured mail transports.
 
 This documents the selected hosting arrangement and public URLs. It does not
-claim to inspect Atlas regions, cluster tiers, replica counts or private
-production configuration.
+includes the Central India VM and its local single-member MongoDB replica set.
 
-Evidence: [`backend/railway.json`](../../backend/railway.json),
+Evidence: [`medreach@.service`](../../backend/operations/azure/medreach@.service),
 [`emailService.js`](../../backend/src/services/emailService.js),
 [deployment guide](../deployment.md).
 [Semantic Mermaid companion](deployment-architecture.mmd).
