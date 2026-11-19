@@ -41,3 +41,6 @@ export * from "./providerApplication.js";
 
 export * from "./scrollAnimation.js";
 export * from "../../../packages/core/src/homeResources.js";
+
+export { useBedRequest } from "./useBedRequest.js";
+export { useDialogFocus } from "./useDialogFocus.js";

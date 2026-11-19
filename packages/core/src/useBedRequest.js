@@ -1,8 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { productApi } from "./productApi";
 
-export function useBedRequest(id) {
+export function useBedRequest(id, productApi) {
   const [request, setRequest] = useState(null);
   const [emailHistory, setEmailHistory] = useState({ available: true, items: [] });
   const [permissions, setPermissions] = useState({});
@@ -37,7 +36,7 @@ export function useBedRequest(id) {
     } finally {
       if (current === generation.current && check === sequence.current) setRefreshing(false);
     }
-  }, [id, trackingHeaders]);
+  }, [id, productApi, trackingHeaders]);
   useEffect(() => {
     generation.current += 1;
     setRequest(null); setError(""); setActionError("");

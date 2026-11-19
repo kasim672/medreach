@@ -1,5 +1,4 @@
 "use client";
-import React from "react";
 import HealthcareAssistant from "./HealthcareAssistant";
 
 // Forwarding wrapper for backward compatibility with SosButton or any existing call sites

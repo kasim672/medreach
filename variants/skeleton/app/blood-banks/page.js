@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import ResourceDirectory from "../../components/ResourceDirectory";
 import BloodBankActionModal from "../../components/BloodBankActionModal";
 import { productApi, post } from "../../lib/productApi";

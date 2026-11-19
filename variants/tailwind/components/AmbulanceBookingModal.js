@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import EmergencyIcon from "./EmergencyIcons";
 import { useAuth } from "@medreach/core";
 import { post } from "../lib/productApi";

@@ -2,9 +2,7 @@
 // presentation differs. Works over an in-memory hospital list (fixtures or API
 // results) so the same behavior holds in demo and live mode.
 
-import { rankHospitals, scoreHospital } from "./ranking.js";
-import { distanceKm } from "./location.js";
-import { freshnessLabel } from "./freshness.js";
+import { rankHospitals } from "./ranking.js";
 
 function facilityStatus(hospital, facility) {
   return (hospital.facilities || []).find((x) => x.facility === facility)?.status ?? "unknown";

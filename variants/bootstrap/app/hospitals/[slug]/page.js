@@ -13,7 +13,6 @@ export default function HospitalPage() {
   const { user } = useAuth();
   const [saved, setSaved] = useState(false);
   const [enrichedData, setEnrichedData] = useState(null);
-  const [enriching, setEnriching] = useState(true);
 
   useEffect(() => {
     let active = true;
@@ -27,9 +26,6 @@ export default function HospitalPage() {
       })
       .catch(() => {
         // Graceful fallback to baseHospital
-      })
-      .finally(() => {
-        if (active) setEnriching(false);
       });
 
     return () => {

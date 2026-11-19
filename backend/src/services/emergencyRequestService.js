@@ -3,11 +3,8 @@ import { routeRequestSafely, assignedProviderUsers } from "./requestNotification
 import { randomBytes } from "node:crypto";
 import { EmergencyRequest } from "../models/EmergencyRequest.js";
 import { Hospital } from "../models/Hospital.js";
-import { User } from "../models/User.js";
 import { AuditLog } from "../models/AuditLog.js";
 import { canManageHospital } from "./hospitalAccess.js";
-import { sendUserEmailSafely } from "./userEmailService.js";
-import { runEmailBatch } from "./emailBatch.js";
 import { generateTrackingToken, hashTrackingToken, trackingTokenForIdempotency, verifyTrackingToken } from "../utils/trackingToken.js";
 
 import { sendEmailEvent } from "./emailService.js";
@@ -77,10 +74,9 @@ export async function createEmergencyRequest(data, actor) {
     }
     throw error;
   }
-  let connectedStaff = [];
   let hasHospitalStaff = false;
   try {
-    connectedStaff = await assignedProviderUsers("hospital", hospital._id);
+    const connectedStaff = await assignedProviderUsers("hospital", hospital._id);
     hasHospitalStaff = connectedStaff.length > 0;
     if (hasHospitalStaff) {
       request.status = "SENT";
@@ -89,7 +85,6 @@ export async function createEmergencyRequest(data, actor) {
     }
   } catch (error) {
     console.warn("Emergency request recorded but staff routing status could not be updated:", error.message);
-    connectedStaff = [];
     hasHospitalStaff = false;
     request.status = "REQUESTED";
     request.timeline = request.timeline.slice(0, 1);

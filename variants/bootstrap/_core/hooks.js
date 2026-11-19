@@ -2,7 +2,7 @@
 // Headless React hooks — data + state only, ZERO markup. Every variant uses these
 // identical hooks and supplies its own UI, so behavior is held constant.
 
-import { useState, useEffect, useCallback, useMemo, useSyncExternalStore } from "react";
+import { useState, useEffect, useCallback, useSyncExternalStore } from "react";
 import { canAccessAdmin } from "./constants.js";
 import * as api from "./api.js";
 import { createAuthSession } from "./authSession.js";

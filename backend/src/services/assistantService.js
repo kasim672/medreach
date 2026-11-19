@@ -37,8 +37,6 @@ export const MUMBAI_LOCALITIES = [
   "Colaba", "Juhu", "Kandivali", "Mulund", "Sion", "Vashi",
 ];
 
-const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
-
 export function detectEmergencyIntent(message) {
   const lower = (message || "").toLowerCase();
   return EMERGENCY_KEYWORDS.some((kw) => lower.includes(kw));
@@ -179,8 +177,8 @@ export async function buildContext(message, { origin, locality: providedLocality
   let diagnostics = [];
   let ambulances = [];
   let jobs = [];
-  let suggestedActions = [];
-  let suggestedPrompts = [];
+  let suggestedActions;
+  let suggestedPrompts;
   let searchScope = null;
 
   switch (intent) {

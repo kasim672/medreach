@@ -3,7 +3,6 @@ import { OrganizationApplication } from "../models/OrganizationApplication.js";
 import { Hospital } from "../models/Hospital.js";
 import { ResourceProvider } from "../models/ResourceProvider.js";
 import { AuditLog } from "../models/AuditLog.js";
-import { User } from "../models/User.js";
 import { providerEmailTasks } from "../services/requestNotifications.js";
 import { canManageResource } from "../services/providerAccess.js";
 import { canManageHospital } from "../services/hospitalAccess.js";

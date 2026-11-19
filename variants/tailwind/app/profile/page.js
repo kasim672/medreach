@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { authStatus, changePassword, logout, me, requestVerification, revokeSession,
+import { authStatus, changePassword, logout, me, revokeSession,
   safeReturnTo, updateProfile } from "@medreach/core";
 
 const date = (value) => value ? new Date(value).toLocaleString() : "Unknown";

@@ -1,8 +1,7 @@
 "use client";
 import { useState, useRef, useCallback } from "react";
-import { useDialogFocus } from "../lib/useDialogFocus";
 import Link from "next/link";
-import { ASSISTANT_ENTRY_LABEL, ASSISTANT_ENTRY_SUBTITLE } from "@medreach/core";
+import { ASSISTANT_ENTRY_LABEL, ASSISTANT_ENTRY_SUBTITLE, useDialogFocus } from "@medreach/core";
 import { btnPrimary, btnOutlineSecondary } from "../lib/tone";
 import dynamic from "next/dynamic";
 const AiAssistantModal = dynamic(() => import("./AiAssistantModal"), { ssr: false });

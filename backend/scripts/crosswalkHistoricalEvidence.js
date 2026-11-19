@@ -1,7 +1,7 @@
 /** Reads historical BSON archive bytes only; never connects to MongoDB or writes repairs. */
 import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
-import { basename, resolve, relative, sep } from 'node:path';
+import { resolve, relative, sep } from 'node:path';
 import { gunzipSync } from 'node:zlib';
 import { pathToFileURL } from 'node:url';
 import mongoose from 'mongoose';

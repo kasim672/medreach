@@ -1,8 +1,8 @@
 "use client";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useAuth } from "@medreach/core";
-import { useBedRequest } from "../../../lib/useBedRequest";
+import { useAuth, useBedRequest } from "@medreach/core";
+import { productApi } from "../../../lib/productApi";
 import RequestLifecycle from "../../../components/RequestLifecycle";
 import RequestRefresh from "../../../components/RequestRefresh";
 import { EmergencyIcon } from "../../../components/EmergencyIcons";
@@ -10,7 +10,7 @@ import { EmergencyIcon } from "../../../components/EmergencyIcons";
 export default function RequestDetail() {
   const { id } = useParams();
   const { user } = useAuth();
-  const model = useBedRequest(id);
+  const model = useBedRequest(id, productApi);
   const { request, error, busy, cancel } = model;
 
   return (

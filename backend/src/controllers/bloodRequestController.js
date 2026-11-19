@@ -7,7 +7,6 @@ import { sendEmailEvent } from "../services/emailService.js";
 import { TRACKING_TOKEN_HEADER, generateTrackingToken, hashTrackingToken, trackingTokenForIdempotency, verifyTrackingToken } from "../utils/trackingToken.js";
 import { ResourceProvider } from "../models/ResourceProvider.js";
 import { IDEMPOTENCY_REPLAY_ERROR } from "../middleware/idempotency.js";
-import { runEmailBatch } from "../services/emailBatch.js";
 
 function generateReference(type) {
   const prefix = type === "DONATION" ? "BDP" : "BR";

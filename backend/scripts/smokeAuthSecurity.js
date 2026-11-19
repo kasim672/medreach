@@ -5,10 +5,8 @@ import http from "node:http";
 import { createApp } from "../src/app.js";
 import { User } from "../src/models/User.js";
 import { AuthToken } from "../src/models/AuthToken.js";
-import { AuditLog } from "../src/models/AuditLog.js";
 import { verifyToken, signToken } from "../src/utils/token.js";
 import { digestToken, issueSession } from "../src/services/authTokenService.js";
-import { env } from "../src/config/env.js";
 
 const MONGO_URI = process.env.MEDREACH_AUTH_TEST_MONGO_URI || "mongodb://127.0.0.1:27017/medreach_smoke_test";
 
@@ -174,11 +172,6 @@ async function main() {
     });
 
     await runStep("Registration", "Rejects password shorter than 12 characters", async () => {
-      const res = await request(app)
-        .post("/api/auth/register")
-        .set("X-Forwarded-For", "10.0.1.2")
-        .send({ name: "User", email: "valid@example.test", password: "Short1Password" });
-      // "Short1Password" is 14 chars. Let's test "Aa1!" (4 chars)
       const resShort = await request(app)
         .post("/api/auth/register")
         .set("X-Forwarded-For", "10.0.1.2")
@@ -384,7 +377,6 @@ async function main() {
     // =========================================================================
 
     let rotatedRefreshCookie = null;
-    let rotatedAuthCookies = null;
     const initialRefreshCookie = `refresh_token=${rawRefreshToken}`;
 
     await runStep("Refresh Token", "Rotates refresh token and issues new access token", async () => {
@@ -395,12 +387,10 @@ async function main() {
       assert.ok(res.body.user);
 
       const newRefreshToken = getCookieVal(res, "refresh_token");
-      const newAccessToken = getCookieVal(res, "token");
       assert.ok(newRefreshToken);
       assert.notEqual(newRefreshToken, rawRefreshToken, "Refresh token must rotate on use");
 
       rotatedRefreshCookie = `refresh_token=${newRefreshToken}`;
-      rotatedAuthCookies = `token=${newAccessToken}; refresh_token=${newRefreshToken}`;
     });
 
     await runStep("Replay Attack Protection", "Replaying previous refresh token triggers replay detection & revokes session family", async () => {

@@ -113,7 +113,7 @@ export const listOrganizationsWithJobs = asyncHandler(async (req, res) => {
       : `custom:${job.organizationName || job._id}`;
 
     if (!orgMap.has(orgKey)) {
-      let meta = {};
+      let meta;
       if (job.hospital) {
         meta = {
           id: job.hospital._id,

@@ -1,5 +1,4 @@
 import { EmergencyRequest } from "../models/EmergencyRequest.js";
-import { Hospital } from "../models/Hospital.js";
 import { canManageHospital } from "../services/hospitalAccess.js";
 import { createEmergencyRequest, changeEmergencyRequest, listVisibleEmergencyRequests } from "../services/emergencyRequestService.js";
 import { requestEmailHistory } from "../services/bedRequestEmails.js";

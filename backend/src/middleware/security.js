@@ -1,12 +1,3 @@
-// Shared security configuration — the EXPERIMENTAL CONSTANT.
-// Every variant (Bootstrap / Tailwind / Skeleton) is served behind exactly this
-// config. Because it is identical, app-level security scans are expected to come
-// back nearly identical across variants (plan §4) — the framework signal shows up
-// in dependencies, supply-chain, maintenance, and CSS-attack-surface instead.
-//
-// TODO(M1): finalize CSP once each variant's real asset origins are known.
-// Keep the policy BYTE-IDENTICAL across variants or the comparison is invalid.
-
 import helmet from "helmet";
 import { sharedLimiter } from "./sharedLimiter.js";
 import cors from "cors";
@@ -33,12 +24,11 @@ export function applySecurity(app, { rateLimitStoreFactory } = {}) {
   app.use(
     helmet({
       contentSecurityPolicy: {
-        // Strict baseline. Prefer nonces over 'unsafe-inline' — record whether
-        // each variant forces you to relax this (that relaxation is a finding).
+        // The shared API policy is independent of each frontend's asset policy.
         directives: {
           defaultSrc: ["'self'"],
           scriptSrc: ["'self'"],
-          styleSrc: ["'self'"], // NOTE: CDN-loaded framework CSS would need adding — log it
+          styleSrc: ["'self'"],
           imgSrc: ["'self'", "data:"],
           connectSrc: ["'self'"],
           frameAncestors: ["'none'"],
