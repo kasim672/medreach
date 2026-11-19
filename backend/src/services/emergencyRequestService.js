@@ -1,3 +1,4 @@
+import { safeErrorMetadata } from "../utils/logRedaction.js";
 import { organizationIsAvailable } from "./providerLifecycle.js";
 import { routeRequestSafely, assignedProviderUsers } from "./requestNotifications.js";
 import { randomBytes } from "node:crypto";
@@ -21,7 +22,7 @@ const transitions = {
   REJECTED: [], EXPIRED: [], CANCELLED: [], COMPLETED: [],
 };
 
-export async function createEmergencyRequest(data, actor) {
+export async function createEmergencyRequest(data, actor, correlationId) {
   async function replay() {
     if (!data.idempotencyKeyHash) return null;
     const previous = await EmergencyRequest.findOne({ idempotencyKeyHash: data.idempotencyKeyHash })
@@ -84,7 +85,7 @@ export async function createEmergencyRequest(data, actor) {
       await request.save();
     }
   } catch (error) {
-    console.warn("Emergency request recorded but staff routing status could not be updated:", error.message);
+    console.warn("Emergency request recorded but staff routing status could not be updated:", safeErrorMetadata(error, correlationId));
     hasHospitalStaff = false;
     request.status = "REQUESTED";
     request.timeline = request.timeline.slice(0, 1);
@@ -94,7 +95,7 @@ export async function createEmergencyRequest(data, actor) {
       entityId: request._id, after: { status: request.status, hospital: hospital._id, requestId: request.requestId,
         hospitalStaffConnected: hasHospitalStaff, guest: !userId } });
   } catch (error) {
-    console.warn("Emergency request recorded but audit logging failed:", error.message);
+    console.warn("Emergency request recorded but audit logging failed:", safeErrorMetadata(error, correlationId));
   }
 
   const userRecipient = (data.contactEmail?.trim() || actor?.email || "").toLowerCase();
@@ -111,7 +112,7 @@ export async function createEmergencyRequest(data, actor) {
           data: { reference: request.requestId, hospital: hospital.name, connected: hasHospitalStaff, isEmergency },
         });
       } catch (err) {
-        console.warn("Failed to dispatch emergency request user confirmation email:", err.message);
+        console.warn("Failed to dispatch emergency request user confirmation email:", safeErrorMetadata(err, correlationId));
       }
     });
   }

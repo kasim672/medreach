@@ -1,3 +1,4 @@
+import { safeErrorMetadata } from "../utils/logRedaction.js";
 import { archivedOrganizationIds, organizationIsArchived } from "../services/providerLifecycle.js";
 import { Job } from "../models/Job.js";
 import { JobApplication } from "../models/JobApplication.js";
@@ -434,7 +435,7 @@ export const applyToJob = asyncHandler(async (req, res) => {
     entityId: application._id,
     after: { job: job._id, status: application.status },
     requestId: req.id,
-  }); } catch (error) { console.warn("Job application recorded but audit logging failed:", error.message); }
+  }); } catch (error) { console.warn("Job application recorded but audit logging failed:", safeErrorMetadata(error, req.id)); }
 
   const emails = [() => sendUserEmailSafely({
     recipient: req.user.id,

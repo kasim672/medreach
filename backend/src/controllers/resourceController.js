@@ -1,3 +1,4 @@
+import { safeErrorMetadata } from "../utils/logRedaction.js";
 import { organizationIsAvailable, archiveProviderOrganization } from "../services/providerLifecycle.js";
 import { readPublicResources } from "../services/publicResourceRead.js";
 import mongoose from "mongoose";
@@ -202,7 +203,7 @@ export const bookAmbulance = asyncHandler(async (req, res) => {
 
   async function deliver(recipient, event) {
     try { await sendBookingEmail(booking, recipient, event); }
-    catch (error) { console.warn(`Ambulance booking ${reference} recorded but ${recipient} delivery state could not be saved:`, error.message); }
+    catch (error) { console.warn(`Ambulance booking recorded but ${recipient} delivery state could not be saved:`, safeErrorMetadata(error, req.id)); }
   }
   if (userEmail) {
     await deliver("user", {

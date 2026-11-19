@@ -1,3 +1,4 @@
+import { safeErrorMetadata } from "../utils/logRedaction.js";
 import { organizationIsAvailable } from "../services/providerLifecycle.js";
 import { routeRequestSafely } from "../services/requestNotifications.js";
 import crypto from "crypto";
@@ -146,7 +147,7 @@ export const createBloodRequest = asyncHandler(async (req, res) => {
           },
         });
       } catch (err) {
-        console.warn("Failed to dispatch blood request user confirmation email:", err.message);
+        console.warn("Failed to dispatch blood request user confirmation email:", safeErrorMetadata(err, req.id));
       }
     });
   }

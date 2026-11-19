@@ -6,7 +6,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { TRACKING_TOKEN_HEADER, verifyTrackingToken } from "../utils/trackingToken.js";
 
 export const createRequest = asyncHandler(async (req, res) => {
-  const result = await createEmergencyRequest({ ...req.body, idempotencyKeyHash: req.idempotencyKeyHash }, req.user);
+  const result = await createEmergencyRequest({ ...req.body, idempotencyKeyHash: req.idempotencyKeyHash }, req.user, req.id);
   res.status(result.status || 201).json(result.error
     ? { error: result.error }
     : { request: result.request, ...(result.trackingToken ? { trackingToken: result.trackingToken } : {}) });

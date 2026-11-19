@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useHospital, saveHospital, useAuth } from "@medreach/core";
+import { useHospital, saveHospital, useAuth, safeWebUrl } from "@medreach/core";
 import { productApi } from "../../../lib/productApi";
 import { EmergencyIcon } from "../../../components/EmergencyIcons";
 import HospitalBedAvailability from "../../../components/HospitalBedAvailability";
@@ -47,6 +47,7 @@ export default function HospitalPage() {
   }
 
   const hospital = enrichedData || baseHospital;
+  const website = safeWebUrl(hospital?.website) || safeWebUrl(baseHospital?.website);
 
   if (notFound || !hospital) {
     return (
@@ -143,7 +144,7 @@ export default function HospitalPage() {
             </dl>
           </div>
 
-          {(hospital.website || baseHospital?.website) && <p><a href={hospital.website || baseHospital.website} target="_blank" rel="noopener noreferrer">Official website ↗</a></p>}
+          {website && <p><a href={website} target="_blank" rel="noopener noreferrer">Official website ↗</a></p>}
         </div>
 
         {/* Hospital actions sidebar */}

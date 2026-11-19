@@ -85,6 +85,29 @@ Resume links/uploads retain existing safety validation. Directory-grounded AI
 fallbacks do not invent providers or availability; enabling an external AI
 service is a privacy decision described in [privacy](privacy.md).
 
+Provider website links in public directories accept absolute HTTP and HTTPS
+URLs without embedded credentials. Private request routes mark responses as
+`no-store` before rejecting invalid input. Error logs for request delivery,
+search, audit persistence and API startup use bounded error metadata. CI jobs
+use read-only repository permissions and discard checkout credentials.
+
+## Independent assessment
+
+Use an isolated deployment with synthetic records, two provider organisations
+and test accounts for every role. Give the assessor a fixed revision, the
+enabled feature flags and written authorisation for the assessment. Ask for
+each finding to include impact, affected role and route, and redacted evidence
+with the requirements it covers. Use the [OWASP ASVS](https://asvs.owasp.org/)
+to define the review scope.
+
+| Priority | Area | Evidence to collect |
+| --- | --- | --- |
+| First | Privileged sign-in | Confirm deployed MFA policy, unique administrator credentials, recovery ownership, session revocation and recent reauthentication. Check System Admin and Provider Admin separately. |
+| First | Record access | Verify permissions with two independent organisations, signed-out visitors, ordinary users and guest tracking links. Include resumes, exports, diagnostic requests and provider administration. |
+| First | Deployment boundaries | Confirm that Caddy is the trusted ingress, the API and MongoDB ports are private, production CORS allows the intended frontends, and cookies and redirects work over HTTPS. |
+| Next | Integrations and data recovery | Verify signed webhook handling, notification retries and delivery evidence, private backup storage, and a restore into an isolated environment. |
+| Next | Repository settings | Review GitHub secret scanning, push protection, dependency alerts and release workflow permissions. Check for historical and operational secrets separately from dependency advisories. |
+
 ## Data and deployment boundaries
 
 Stored provenance remains even though crawler execution and scraping badges are

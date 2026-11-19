@@ -21,7 +21,7 @@ async function resolveAccessContext(token) {
     return { error: "Authentication temporarily unavailable", status: 503 };
   }
   const [current, session] = await Promise.all([
-    User.findById(payload.sub).select("+authVersion").lean(),
+    User.findById(payload.sub).select("role email name accountStatus demoAccount credentialState credentialDelivery +authVersion").lean(),
     AuthToken.exists({ familyId: payload.sid, user: payload.sub,
       purpose: "refresh_session", usedAt: { $exists: false }, revokedAt: { $exists: false },
       expiresAt: { $gt: new Date() } }),
@@ -29,14 +29,12 @@ async function resolveAccessContext(token) {
   if (!current || current.accountStatus !== "active" || ((current.demoAccount || current.credentialState === "demo_default") && !isolatedDemoEnabled()) || (current.credentialDelivery === "manual" && !localManualCredentialsEnabled()) || Number(current.authVersion || 0) !== Number(payload.av || 0)) {
     return { error: "Session is no longer valid" };
   }
-  if (current && await mfaRequiredForUser(current) && !await AuthToken.exists({ familyId: payload.sid, user: payload.sub,
+  if (await mfaRequiredForUser(current) && !await AuthToken.exists({ familyId: payload.sid, user: payload.sub,
     purpose: "refresh_session", usedAt: { $exists: false }, revokedAt: { $exists: false },
     expiresAt: { $gt: new Date() }, "metadata.mfaAuthenticated": true })) {
     return { error: "Sign in again with MFA", status: 401 };
   }
-  if (!session) {
-    return { error: "Session is no longer valid" };
-  }
+  if (!session) return { error: "Session is no longer valid" };
   let scope;
   try { scope = await assignedContext({ id: payload.sub, role: current.role }); }
   catch { return { error: "Provider permissions temporarily unavailable", status: 503 }; }

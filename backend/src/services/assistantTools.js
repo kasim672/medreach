@@ -1,6 +1,7 @@
 // Reusable backend tools for MedReach Assistant
 // Queries real MongoDB collections only — NEVER fabricates data.
 
+import { safeErrorMetadata } from "../utils/logRedaction.js";
 import { archivedHospitalIds } from "./providerLifecycle.js";
 import { Hospital } from "../models/Hospital.js";
 import { HospitalFacility } from "../models/HospitalFacility.js";
@@ -140,7 +141,7 @@ export async function searchHospitals({ locality, category, specialty, emergency
       })
     );
   } catch (err) {
-    console.error("searchHospitals error:", err);
+    console.error("searchHospitals error:", safeErrorMetadata(err));
     throw err;
   }
 }
@@ -189,7 +190,7 @@ export async function searchBloodBanks({ locality, bloodGroup, limit = 4, origin
       return summary;
     });
   } catch (err) {
-    console.error("searchBloodBanks error:", err);
+    console.error("searchBloodBanks error:", safeErrorMetadata(err));
     return [];
   }
 }
@@ -238,7 +239,7 @@ export async function searchDiagnostics({ locality, service, limit = 4, origin }
       return summary;
     });
   } catch (err) {
-    console.error("searchDiagnostics error:", err);
+    console.error("searchDiagnostics error:", safeErrorMetadata(err));
     return [];
   }
 }
@@ -287,7 +288,7 @@ export async function searchAmbulances({ locality, providerType, limit = 4, orig
       return summary;
     });
   } catch (err) {
-    console.error("searchAmbulances error:", err);
+    console.error("searchAmbulances error:", safeErrorMetadata(err));
     return [];
   }
 }
@@ -332,7 +333,7 @@ export async function searchJobs({ locality, department, query, limit = 4 } = {}
       createdAt: j.createdAt,
     }));
   } catch (err) {
-    console.error("searchJobs error:", err);
+    console.error("searchJobs error:", safeErrorMetadata(err));
     return [];
   }
 }
@@ -371,7 +372,7 @@ export async function getHospitalDetails({ idOrSlug }) {
         ? h.location.coordinates : null,
     };
   } catch (err) {
-    console.error("getHospitalDetails error:", err);
+    console.error("getHospitalDetails error:", safeErrorMetadata(err));
     return null;
   }
 }

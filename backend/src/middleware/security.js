@@ -9,6 +9,7 @@ import { env } from "../config/env.js";
 // bug where this module loaded before dotenv ran, silently allowing only
 // :3000 and blocking the tailwind (:3001) and skeleton (:3002) variants.
 const ALLOWED_ORIGINS = env.corsOrigins;
+const PRIVATE_API_PATH = /^\/api\/(?:auth|emergency-requests|blood-requests|tracking|ambulances\/(?:book|bookings)|diagnostics\/requests)(?:\/|$)/i;
 
 function csrfOriginGuard(req, res, next) {
   if (["GET", "HEAD", "OPTIONS"].includes(req.method) || !req.headers.cookie) return next();
@@ -47,18 +48,18 @@ export function applySecurity(app, { rateLimitStoreFactory } = {}) {
   });
 
   app.use(cors({ origin: ALLOWED_ORIGINS, credentials: true }));
+  app.use((req, res, next) => {
+    if (req.headers.authorization || req.cookies?.token || req.get("X-MedReach-Tracking-Token") || PRIVATE_API_PATH.test(req.path)) {
+      res.set("Cache-Control", "no-store");
+    }
+    next();
+  });
   app.use(csrfOriginGuard);
   // Filters in this API are scalars. Reject parsed Mongo operators and repeated/nested values.
   app.use((req, res, next) => {
     if (Object.entries(req.query).some(([key, value]) => typeof value !== "string" || /[.$[\]]/.test(key)
       || ["__proto__", "prototype", "constructor"].includes(key))) {
       return res.status(400).json({ error: "Query parameters must be plain values" });
-    }
-    if (req.headers.authorization || req.cookies?.token || req.get("X-MedReach-Tracking-Token") ||
-        req.path.startsWith("/api/auth/") || /^\/api\/(emergency-requests|blood-requests|tracking)(?:\/|$)/.test(req.path) ||
-        /^\/api\/ambulances\/(?:book|bookings)(?:\/|$)/.test(req.path) ||
-        /^\/api\/diagnostics\/requests(?:\/|$)/.test(req.path)) {
-      res.set("Cache-Control", "no-store");
     }
     next();
   });

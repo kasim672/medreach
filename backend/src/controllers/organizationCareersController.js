@@ -1,3 +1,4 @@
+import { safeErrorMetadata } from "../utils/logRedaction.js";
 import { organizationIsAvailable, archivedHospitalIds } from "../services/providerLifecycle.js";
 import { OrganizationApplication } from "../models/OrganizationApplication.js";
 import { Hospital } from "../models/Hospital.js";
@@ -184,7 +185,7 @@ export const applyToOrganization = asyncHandler(async (req, res) => {
     entityId: application._id,
     after: { organizationType, hospital: applicationData.hospital, provider: applicationData.provider },
     requestId: req.id,
-  }); } catch (error) { console.warn("Organization application recorded but audit logging failed:", error.message); }
+  }); } catch (error) { console.warn("Organization application recorded but audit logging failed:", safeErrorMetadata(error, req.id)); }
 
   const emails = [() => sendUserEmailSafely({
     recipient: req.user.id,

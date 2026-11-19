@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useHospital, availabilityMeta, saveHospital, useAuth } from "@medreach/core";
+import { useHospital, availabilityMeta, saveHospital, useAuth, safeWebUrl } from "@medreach/core";
 import { toneClass } from "../../../lib/tone";
 import FacilityStatus from "../../../components/FacilityStatus";
 
@@ -37,6 +37,7 @@ export default function HospitalPage() {
   }
 
   const hospital = baseHospital;
+  const website = safeWebUrl(hospital?.website);
   const m = availabilityMeta(edStatus(hospital));
   const coords = enrichedData?.location?.coordinates || hospital.location?.coordinates || [];
   const address = enrichedData?.address && enrichedData.address !== "Not available." ? enrichedData.address : hospital.address;
@@ -119,7 +120,7 @@ export default function HospitalPage() {
             <p className="disclaimer mb-0">
               Availability may have changed. Confirm by phone before travelling.
             </p>
-            {(hospital.website || baseHospital?.website) && <p><a href={hospital.website || baseHospital.website} target="_blank" rel="noopener noreferrer">Official website ↗</a></p>}
+            {website && <p><a href={website} target="_blank" rel="noopener noreferrer">Official website ↗</a></p>}
 
           </div>
         </div>

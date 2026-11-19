@@ -44,3 +44,4 @@ export * from "../../../packages/core/src/homeResources.js";
 
 export { useBedRequest } from "./useBedRequest.js";
 export { useDialogFocus } from "./useDialogFocus.js";
+export { safeWebUrl } from "./webUrl.js";

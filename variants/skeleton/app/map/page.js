@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { safeWebUrl } from "@medreach/core";
 import GoogleMapView from "../../components/GoogleMapView";
 import AmbulanceBookingModal from "../../components/AmbulanceBookingModal";
 
@@ -90,6 +91,7 @@ export default function MapPage() {
     (item) => String(item._id) === selected || item.slug === selected
   );
 
+  const website = safeWebUrl(selectedItem?.website);
   const coords = selectedItem?.location?.coordinates || [];
   const hasCoords =
     coords.length === 2 && Number.isFinite(coords[0]) && Number.isFinite(coords[1]);
@@ -401,8 +403,8 @@ export default function MapPage() {
                 style={{ borderTop: "1px solid var(--color-border)" }}
               >
                 {selectedItem.demo && <span>DEMO</span>}
-                {selectedItem.website && (
-                  <a href={selectedItem.website} target="_blank" rel="noopener noreferrer">
+                {website && (
+                  <a href={website} target="_blank" rel="noopener noreferrer">
                     Official Website ↗
                   </a>
                 )}

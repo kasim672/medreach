@@ -1,4 +1,5 @@
 // Entry point: connect DB, then start the HTTP server.
+import { safeErrorMetadata } from "./utils/logRedaction.js";
 import { createApp } from "./app.js";
 import { connectDB, disconnectDB, enableDatabaseTelemetry } from "./config/db.js";
 import { env } from "./config/env.js";
@@ -21,6 +22,6 @@ connectDB()
       disconnect: disconnectDB });
   })
   .catch((err) => {
-    console.error("[medreach] Failed to start — is MongoDB running?\n", err.message);
+    console.error("[medreach] API startup failed:", safeErrorMetadata(err));
     process.exit(1);
   });

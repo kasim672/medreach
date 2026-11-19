@@ -72,6 +72,16 @@ test("private request responses disable caching even on authorization failures",
   }
 });
 
+test("private routes disable caching before rejecting invalid input, regardless of path casing", async () => {
+  const invalidQuery = await request(app).get("/API/Auth/me?filter=one&filter=two");
+  assert.equal(invalidQuery.status, 400);
+  assert.equal(invalidQuery.headers["cache-control"], "no-store");
+
+  const signedOut = await request(app).get("/api/EmErGeNcY-ReQuEsTs");
+  assert.equal(signedOut.status, 401);
+  assert.equal(signedOut.headers["cache-control"], "no-store");
+});
+
 for (const query of ["limit=-1000000", "limit=garbage", "page=-1", "page=1.5", "lat=91&lng=72", "lat=19&lng=181"]) {
   test(`hospital query refuses unsafe pagination/coordinates: ${query}`, async () => {
     assert.equal((await request(app).get(`/api/hospitals?${query}`)).status, 400);
