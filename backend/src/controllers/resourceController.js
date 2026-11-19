@@ -149,7 +149,7 @@ export const bookAmbulance = asyncHandler(async (req, res) => {
 
   const userEmail = (contactEmail || req.user?.email || "").trim().toLowerCase();
   const reference = `AMB-${Date.now().toString(36).toUpperCase()}-${randomBytes(2).toString("hex").toUpperCase()}`;
-  const trackingToken = trackingTokenForIdempotency(req.idempotencyKeyHash) || generateTrackingToken();
+  const trackingToken = (!req.user && trackingTokenForIdempotency(req.idempotencyKeyHash)) || generateTrackingToken();
 
   const bookingData = {
     reference,
@@ -246,7 +246,7 @@ export const getAmbulanceBooking = asyncHandler(async (req, res) => {
   const isAdmin = req.user && (req.user.role === "system_admin" || req.user.providerIds?.includes(String(booking.provider)));
   const isOwner = req.user && booking.user && String(booking.user) === String(req.user.id);
   const suppliedToken = req.get(TRACKING_TOKEN_HEADER);
-  const hasGuestAccess = verifyTrackingToken(suppliedToken, booking.trackingTokenHash);
+  const hasGuestAccess = !booking.user && verifyTrackingToken(suppliedToken, booking.trackingTokenHash);
   if (!isAdmin && !isOwner && !hasGuestAccess) {
     return res.status(403).json({ error: "Private tracking token required" });
   }

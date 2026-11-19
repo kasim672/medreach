@@ -41,10 +41,23 @@ active System Admin against concurrent deactivation/demotion. Preserve the main
 
 ## Private requests and patient information
 
-Owner, assigned provider, System Admin or an applicable private guest token is
-required for detailed request access. Reference-only tracking exposes reference,
-status and update time, not contact/medical details or mutation permission.
-Guest tokens must stay out of logs and shared public URLs.
+| Viewer | Request visibility |
+| --- | --- |
+| Signed-in sender | Details of their own request |
+| Assigned provider administrator | Details for the organisation they manage, subject to workflow and approval rules |
+| System Admin | Request details through administrative controls |
+| Guest with a private link | Details of the guest request associated with that link |
+| Visitor with a public reference | Reference, status and last update only |
+
+Signed-in diagnostic requests use the sender’s account for patient tracking.
+Guest links are limited to guest records for diagnostic and ambulance requests.
+The link is an access credential and belongs outside logs, screenshots and
+shared public URLs. Archived hospital assignments no longer grant legacy staff
+access to bed requests through the detail or list endpoints.
+
+The API uses MongoDB through Mongoose. Query validation rejects non-scalar
+filters and unsafe keys before controllers run. The local regression suite
+checks input handling and request access across account roles.
 
 Mutation validation and stale-state checks retain the existing request lifecycle.
 An emergency classification is explicit; `ambulanceRequired` alone is insufficient.

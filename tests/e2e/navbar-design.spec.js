@@ -132,7 +132,7 @@ test("landing Login stays available during scrolling and after navigation", asyn
 test("signed-in accounts expose only their workspace links and confirm logout", async ({ page }) => {
   let signedIn = true, role = "user", logoutRequests = 0;
   await page.route("**/api/auth/me", (route) => route.fulfill({ status: signedIn ? 200 : 401,
-    json: signedIn ? { user: { _id: "111111111111111111111111", name: "Ada Example", email: "fixture@example.test", role } } : { error: "Unauthenticated" } }));
+    json: signedIn ? { user: { _id: "111111111111111111111111", name: "Ada Example", email: "fixture@example.test", region: "Mumbai", role } } : { error: "Unauthenticated" } }));
   await page.route("**/api/auth/sessions", (route) => route.fulfill({ json: { sessions: [], providers: { password: true } } }));
   await page.route("**/api/auth/mfa", (route) => route.fulfill({ json: { eligible: role !== "user", enabled: false } }));
   await page.route("**/api/auth/logout", (route) => { signedIn = false; logoutRequests++; return route.fulfill({ json: { ok: true } }); });
@@ -143,27 +143,20 @@ test("signed-in accounts expose only their workspace links and confirm logout", 
       await page.goto("/");
       const toggle = nav(page).getByRole("button", { name: "Toggle navigation" });
       if (width < 1400) await toggle.click();
-      const profile = nav(page).locator("summary.nav-profile");
-      await expect(profile).toBeVisible();
-      await expect(nav(page).getByRole("link", { name: "Dashboard", exact: true })).toHaveCount(0);
+      const profile = nav(page).getByRole("link", { name: "Profile (Ada)" });
+      await expect(profile).toHaveAttribute("href", "/dashboard");
       await profile.click();
-      await expect(nav(page).getByRole("link", { name: "Dashboard", exact: true })).toBeVisible();
-      await expect(nav(page).getByRole("link", { name: "Admin workspace", exact: true })).toHaveCount(role === "system_admin" ? 1 : 0);
-      await expect(nav(page).getByRole("link", { name: "Provider workspace", exact: true })).toHaveCount(["provider_admin", "hospital_admin"].includes(role) ? 1 : 0);
-      await page.keyboard.press("Escape");
-      await expect(nav(page).locator("details")).not.toHaveAttribute("open", "");
-      await expect(profile).toBeFocused();
-      await profile.click();
-      await nav(page).getByRole("link", { name: "Profile & security", exact: true }).click();
-      await expect(page).toHaveURL(/\/profile$/);
-      if (width < 1400) await toggle.click();
-      await profile.click();
-      await nav(page).getByRole("button", { name: "Log out", exact: true }).click();
+      await expect(page).toHaveURL(/\/dashboard$/);
+      const account = page.getByRole("navigation", { name: "Account", exact: true });
+      await expect(account.getByRole("link", { name: "Profile", exact: true })).toBeVisible();
+      await expect(account.getByRole("link", { name: "Admin", exact: true })).toHaveCount(role === "system_admin" ? 1 : 0);
+      await expect(account.getByRole("link", { name: "Provider", exact: true })).toHaveCount(["provider_admin", "hospital_admin"].includes(role) ? 1 : 0);
+      await account.getByRole("button", { name: "Log out", exact: true }).click();
       const dialog = page.getByRole("dialog", { name: "Log out of MedReach?" });
       const previous = logoutRequests;
       await dialog.getByRole("button", { name: "Stay signed in" }).click();
       expect(logoutRequests).toBe(previous);
-      await nav(page).getByRole("button", { name: "Log out", exact: true }).click();
+      await account.getByRole("button", { name: "Log out", exact: true }).click();
       await dialog.getByRole("button", { name: "Log out", exact: true }).click();
       await expect(page).toHaveURL(/\/login$/);
       expect(logoutRequests).toBe(previous + 1);

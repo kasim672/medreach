@@ -15,7 +15,7 @@ export const listRequests = asyncHandler(async (req, res) => res.json({ data: aw
 export const getRequest = asyncHandler(async (req, res) => {
   const request = await EmergencyRequest.findById(req.params.id)
     .select("+trackingTokenHash")
-    .populate("hospital", "name slug admins phone emergencyPhone address location");
+    .populate("hospital", "name slug admins archivedAt phone emergencyPhone address location");
   if (!request) return res.status(404).json({ error: "Request not found" });
   if (request.user) {
     if (!req.user || (String(request.user) !== req.user.id && !canManageHospital(req.user, request.hospital) && !["system_admin"].includes(req.user.role))) {
@@ -28,6 +28,7 @@ export const getRequest = asyncHandler(async (req, res) => {
   const safeRequest = request.toJSON();
   if (safeRequest.hospital && typeof safeRequest.hospital === "object") {
     delete safeRequest.hospital.admins;
+    delete safeRequest.hospital.archivedAt;
   }
   res.json({ request: safeRequest, emailHistory: await requestEmailHistory(request),
     permissions: { canRespond: canManageHospital(req.user, request.hospital),

@@ -59,6 +59,25 @@ an appointment or ambulance dispatch. The app is not a medical advice service.
 See the [full screenshot gallery](docs/screenshots/README.md) for mobile views,
 emergency discovery and all three frontend variants.
 
+### Account workspace and demo
+
+In Bootstrap, the signed-in **Profile** link opens the dashboard. Choose profile
+and security, the assigned provider workspace, or administration from the
+account sidebar. These screenshots use synthetic test accounts.
+
+| Dashboard | Admin overview |
+| --- | --- |
+| ![Member dashboard with the account sidebar and request summaries](docs/screenshots/current/bootstrap-dashboard-1466.jpg) | ![System Admin overview with administration links and workspace cards](docs/screenshots/current/bootstrap-admin-1466.jpg) |
+
+[Profile and security](docs/screenshots/current/bootstrap-profile-1466.jpg) ·
+[Mobile dashboard](docs/screenshots/current/bootstrap-dashboard-390.jpg) ·
+[Mobile System Administrators page](docs/screenshots/current/bootstrap-system-admins-390.jpg)
+
+[![Play the MedReach hospital request walkthrough](variants/bootstrap/public/media/medreach-hospital-demo-poster.webp)](variants/bootstrap/public/media/medreach-hospital-demo.mp4)
+
+[Watch the desktop demo](variants/bootstrap/public/media/medreach-hospital-demo.mp4) ·
+[Watch the mobile demo](variants/bootstrap/public/media/medreach-hospital-demo-mobile.mp4)
+
 ## Three frontends, one product
 
 | Bootstrap | Tailwind | Skeleton |
@@ -85,6 +104,10 @@ Public registration creates regular users. A provider application grants no
 login access before approval and activation. Backend checks enforce role and
 organisation scope, including direct API calls. Historical role values do not
 create new account options. [Security and account lifecycle →](docs/security.md)
+
+Private request details are available to the sender, authorised staff assigned
+to the organisation, and System Admins. A guest can access their guest request
+with its private link. A public reference shows only the status and last update.
 
 ## Run locally
 

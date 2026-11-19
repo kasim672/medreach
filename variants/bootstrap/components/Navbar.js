@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@medreach/core";
 import { useEffect, useRef, useState } from "react";
 import EmergencyIcon from "./EmergencyIcons";
-import LogoutButton from "./LogoutButton";
 
 const LEFT_LINKS = [
   { href: "/", label: "Home", icon: "home" },
@@ -30,27 +29,11 @@ export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const toggleRef = useRef(null);
-  const profileRef = useRef(null);
   const previousUser = useRef(user);
-
-  useEffect(() => {
-    const closeOutside = (event) => {
-      if (document.querySelector(".account-logout-dialog[open]")) return;
-      if (profileRef.current && !profileRef.current.contains(event.target)) profileRef.current.open = false;
-    };
-    document.addEventListener("pointerdown", closeOutside);
-    return () => document.removeEventListener("pointerdown", closeOutside);
-  }, []);
 
   useEffect(() => {
     const closeOnEscape = (event) => {
       if (document.querySelector(".account-logout-dialog[open]")) return;
-      if (event.key === "Escape" && profileRef.current?.open) {
-        event.stopPropagation();
-        profileRef.current.open = false;
-        profileRef.current.querySelector("summary")?.focus();
-        return;
-      }
       if (event.key === "Escape" && open) { event.stopPropagation();
         setOpen(false); toggleRef.current?.focus();
       }
@@ -64,10 +47,7 @@ export default function Navbar() {
     previousUser.current = user;
   }, [user]);
 
-  const closeNavigation = () => {
-    setOpen(false);
-    if (profileRef.current) profileRef.current.open = false;
-  };
+  const closeNavigation = () => setOpen(false);
   const renderLink = ({ href, label, icon }) => {
     const active = pathname === href || href !== "/" && pathname?.startsWith(`${href}/`);
     return <li className="nav-item" key={href}><Link className={`nav-link${active ? " active" : ""}`} href={href} aria-label={href === "/track" ? "Track request" : undefined} aria-current={active ? "page" : undefined} onClick={closeNavigation}><NavIcon name={icon} /><span>{label}</span></Link></li>;
@@ -89,20 +69,11 @@ export default function Navbar() {
             {RIGHT_LINKS.map(renderLink)}
             {user ? (
               <li className="nav-item medreach-profile-item">
-                <details ref={profileRef} className="medreach-profile">
-                  <summary className={`nav-link nav-profile${pathname?.startsWith("/profile") ? " active" : ""}`}>
-                    <span className="nav-avatar"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="7" r="4" /><path d="M4 21v-2a8 8 0 0 1 16 0v2Z" /></svg></span>
-                    <span className="nav-profile-name" title={user.name}>Profile ({user.name?.trim().split(/\s+/)[0] || "Account"})</span>
-                    <svg className="nav-profile-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
-                  </summary>
-                  <ul className="medreach-profile-links" aria-label="Your account">
-                    <li><Link href="/dashboard" onClick={closeNavigation}>Dashboard</Link></li>
-                    <li><Link href="/profile" onClick={closeNavigation}>Profile &amp; security</Link></li>
-                    {user.role === "system_admin" && <li><Link href="/admin" onClick={closeNavigation}>Admin workspace</Link></li>}
-                    {["provider_admin", "hospital_admin"].includes(user.role) && <li><Link href="/provider" onClick={closeNavigation}>Provider workspace</Link></li>}
-                    <li className="nav-account-signout"><LogoutButton className="nav-account-logout">Log out</LogoutButton></li>
-                  </ul>
-                </details>
+                <Link className={`nav-link nav-profile${pathname === "/dashboard" ? " active" : ""}`}
+                  href="/dashboard" aria-current={pathname === "/dashboard" ? "page" : undefined} onClick={closeNavigation}>
+                  <span className="nav-avatar"><EmergencyIcon name="user" size={24} /></span>
+                  <span className="nav-profile-name" title={user.name}>Profile ({user.name?.trim().split(/\s+/)[0] || "Account"})</span>
+                </Link>
               </li>
             ) : (
               <li className="nav-item"><Link className="btn btn-sm btn-primary nav-login" href="/login" onClick={closeNavigation}><EmergencyIcon name="user" size={24} /><span>Login</span></Link></li>

@@ -7,6 +7,16 @@
 .medreach-theme .page-head { padding: 10px 0 12px; }
 .medreach-theme .page-head h1 { font-weight: 750; color: #11182d; }
 .medreach-theme .page-head p { font-size: 1rem; color: var(--color-muted); }
+.medreach-theme #main:not(:has(.account-shell--workspace)) .page-head {
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.medreach-theme #main:not(:has(.account-shell--workspace)) .page-head h1 {
+  font-size: clamp(1.8rem, 1.25rem + 1.7vw, 2.65rem);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.medreach-theme #main:not(:has(.account-shell--workspace)) .page-head p { max-width: 70ch; margin-bottom: 0; }
 .medreach-theme :is(.surface, .card) { border-color: var(--color-border); border-radius: 20px; box-shadow: 0 10px 24px rgba(41, 76, 121, .045); }
 .medreach-theme .surface { padding: clamp(20px, 2vw, 28px); }
 .medreach-theme :is(.surface, .card).rounded { border-radius: 20px !important; }

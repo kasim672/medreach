@@ -32,7 +32,7 @@ router.post("/", optionalAuth, limiter("publicSubmissionLimiter"), captureIdempo
   asyncHandler(async (req, res) => {
     const { record, token, replayed } = await createDiagnosticRequest(req);
     res.set("Cache-Control", "no-store").status(replayed ? 200 : 201).json({ ok: true, reference: record.reference,
-      request: privateDiagnosticRequest(record), trackingToken: token, replayed,
+      request: privateDiagnosticRequest(record), ...(token ? { trackingToken: token } : {}), replayed,
       message: record.capacityAllocation?.mode === "held"
         ? "Capacity is temporarily held. The centre must confirm before the hold expires."
         : "Request recorded for coordination. Capacity and your appointment must be confirmed by the centre." });

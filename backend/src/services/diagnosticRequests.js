@@ -44,13 +44,13 @@ export function canReadDiagnostic(req, record) {
   return Boolean((canManageResource(req.user, { _id: record.provider })
       && (!record.centreApprovalPending || req.user?.role === "system_admin"))
     || (record.user && String(record.user) === String(req.user?.id))
-    || verifyTrackingToken(req.get(TRACKING_TOKEN_HEADER), record.trackingTokenHash));
+    || (!record.user && verifyTrackingToken(req.get(TRACKING_TOKEN_HEADER), record.trackingTokenHash)));
 }
 function canCancelDiagnostic(req, record) {
   // Administrator cancellation uses the privileged status endpoint. This path
   // grants only patient ownership or delegated private-link access.
   return Boolean((record.user && String(record.user) === String(req.user?.id))
-    || verifyTrackingToken(req.get(TRACKING_TOKEN_HEADER), record.trackingTokenHash));
+    || (!record.user && verifyTrackingToken(req.get(TRACKING_TOKEN_HEADER), record.trackingTokenHash)));
 }
 export async function createDiagnosticRequest(req) {
   const body = req.body;
@@ -64,7 +64,7 @@ export async function createDiagnosticRequest(req) {
   const payloadHash = createHash("sha256").update(JSON.stringify(payload)).digest("hex");
   const idempotencyKeyHash = req.idempotencyKeyHash && createHash("sha256")
     .update(`${req.user?.id || "guest"}:${req.idempotencyKeyHash}`).digest("hex");
-  const token = trackingTokenForIdempotency(idempotencyKeyHash) || generateTrackingToken();
+  const token = req.user ? null : trackingTokenForIdempotency(idempotencyKeyHash) || generateTrackingToken();
   const replay = async () => {
     const previous = await DiagnosticRequest.findOne({ idempotencyKeyHash }).select("+payloadHash +trackingTokenHash");
     if (!previous || previous.payloadHash !== payloadHash) throw fail(409, "This submission key was already used for a different request.");
@@ -92,7 +92,7 @@ export async function createDiagnosticRequest(req) {
         contactEmail: payload.contactEmail || undefined, notes: payload.notes || undefined },
       preferredDate: payload.preferredDate, preferredTime: payload.preferredTime, consentAt: new Date(),
       urgency: body.urgency || "ROUTINE", capacityAllocation: allocationSummary(allocation),
-      payloadHash, ...(idempotencyKeyHash ? { idempotencyKeyHash } : {}), trackingTokenHash: hashTrackingToken(token),
+      payloadHash, ...(idempotencyKeyHash ? { idempotencyKeyHash } : {}), trackingTokenHash: hashTrackingToken(token || generateTrackingToken()),
       history: [{ status: "REQUESTED", at: new Date(), actor: req.user?.id }], statusEffects: [effect] });
       await document.save({ ...(session ? { session } : {}) });
       return document;

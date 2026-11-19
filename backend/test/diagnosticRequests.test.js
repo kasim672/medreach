@@ -176,6 +176,16 @@ test("diagnostic request workflow with isolated MongoDB", { skip: !uri }, async 
     assert.equal(await DiagnosticRequest.countDocuments(), count + 1);
     await submit({ ...body(), tests: ["THYROID_PROFILE"] }, "diagnostic-duplicate-001").expect(409);
   });
+  await t.test("account-owned requests require account or staff access and do not issue guest links", async () => {
+    const { body: saved } = await submit(body(), "diagnostic-owner-policy-01", userToken).expect(201);
+    assert.equal(saved.trackingToken, undefined);
+    const url = "/api/diagnostics/requests/" + saved.reference;
+    await request(app).get(url).expect(403);
+    await request(app).get(url).set("Authorization", "Bearer " + outsiderToken).expect(403);
+    await request(app).get(url).set("Authorization", "Bearer " + userToken).expect(200);
+    await request(app).get(url).set("Authorization", "Bearer " + adminToken).expect(200);
+    await request(app).get(url).set("Authorization", "Bearer " + systemToken).expect(200);
+  });
   await t.test("public tracking reveals no patient or appointment details; a private token is required", async () => {
     const { body: saved } = await submit().expect(201);
     const summary = await request(app).get(`/api/tracking/diagnostic/${saved.reference}`).expect(200);

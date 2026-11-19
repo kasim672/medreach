@@ -1,5 +1,21 @@
 # MedReach screenshot gallery
 
+## Bootstrap account workspace
+
+These captures use the Playwright account fixture with synthetic data. The
+application’s connection indicator reflects the fixture connection.
+
+| Page | Desktop | Mobile |
+| --- | --- | --- |
+| Dashboard | [1466 px](current/bootstrap-dashboard-1466.jpg) | [390 px](current/bootstrap-dashboard-390.jpg) |
+| Profile and security | [1466 px](current/bootstrap-profile-1466.jpg) | [390 px](current/bootstrap-profile-390.jpg) |
+| Admin overview | [1466 px](current/bootstrap-admin-1466.jpg) | [390 px](current/bootstrap-admin-390.jpg) |
+| System Administrators | | [390 px](current/bootstrap-system-admins-390.jpg) |
+
+With the local Playwright fixtures ready, set `MEDREACH_CAPTURE_ACCOUNT=1` and
+run `npm run test:e2e -- --project=bootstrap bootstrap-account-workspace`. The
+account theme test writes the captures to its Playwright output directory.
+
 [Project overview](../../README.md) · [Documentation](../README.md)
 
 Captured **22 October 2026** from the actual local application at code baseline

@@ -68,7 +68,9 @@ export default function DiagnosticRequestForm() {
         contactEmail: data.get("contactEmail").trim(), preferredDate: data.get("preferredDate"),
         preferredTime: data.get("preferredTime"), notes: data.get("notes").trim(), consent: data.get("consent") === "on",
       });
-      try { window.sessionStorage.setItem(`medreach:diagnostic-request-token:${response.reference}`, response.trackingToken); } catch { /* The private link remains available. */ }
+      if (response.trackingToken) {
+        try { window.sessionStorage.setItem(`medreach:diagnostic-request-token:${response.reference}`, response.trackingToken); } catch { /* The private link remains available. */ }
+      }
       setResult(response);
     } catch (error) { setError(Array.isArray(error.details) ? error.details.map(detail => detail.msg).join(". ") : error.message); }
     finally { submitting.current = false; setBusy(false); }
@@ -90,8 +92,8 @@ export default function DiagnosticRequestForm() {
       {dailyCapacity && <ul aria-label="Remaining slots after your request">{dailyCapacity.filter(row => result.request.tests.includes(row.test)).map(row => <li key={row.test}>{diagnosticTestLabel(row.test)}: {row.routineRemaining === null ? "Availability unknown" : `${row.routineRemaining} routine slots remaining`}</li>)}</ul>}
       {result.request.centreApprovalPending ? <p className="alert alert-info" role="status">Your request is saved for MedReach review. This centre has not enabled online appointments yet. MedReach must approve the centre before your request can be handed to it; no appointment is booked.</p>
         : result.request.notificationRouting === "no_eligible_recipients" && <p role="status">This centre has no eligible notification contact yet. Your request is saved for administrator follow-up. Contact the centre directly if you need an update.</p>}
-      <Link className="btn btn-primary" href={`/track?type=diagnostic&reference=${result.reference}#token=${encodeURIComponent(result.trackingToken)}`}>Track test request</Link>
-      <p className="text-secondary mt-3 mb-0">Keep your private tracking link safe. It gives access to your request details.</p>
+      <Link className="btn btn-primary" href={`/track?type=diagnostic&reference=${encodeURIComponent(result.reference)}${result.trackingToken ? `#token=${encodeURIComponent(result.trackingToken)}` : ""}`}>Track test request</Link>
+      <p className="text-secondary mt-3 mb-0">{result.trackingToken ? "Keep your private tracking link safe. It gives access to your request details." : "Sign in to this account to see your request details."}</p>
     </section> : provider && <form className="surface p-4 p-md-5" onSubmit={submit} onChange={() => { if (error) setError(""); }}>
       <fieldset disabled={busy}>
         <fieldset className="mb-4"><legend className="h5">Routine or emergency testing</legend><div className="d-flex flex-wrap gap-2">

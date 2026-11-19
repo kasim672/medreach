@@ -14,17 +14,9 @@
 .app-navbar .nav-link.active { color: #0564cc; background: #e7f1fd; font-weight: 650; }
 .app-navbar :is(a, button, summary):focus-visible { outline: 3px solid #2c77d7; outline-offset: 3px; }
 .app-navbar .nav-login { min-height: 48px; padding: 10px 22px; border-radius: 999px; --bs-btn-bg: var(--color-brand); --bs-btn-border-color: var(--color-brand); --bs-btn-hover-bg: var(--color-brand-dark); --bs-btn-hover-border-color: var(--color-brand-dark); }
-.medreach-profile { position: relative; }
 .app-navbar .nav-profile { list-style: none; cursor: pointer; padding: 6px 10px; gap: 12px; }
-.nav-profile::-webkit-details-marker { display: none; }
 .app-navbar .nav-avatar { display: grid; place-items: center; width: 44px; height: 44px; flex: 0 0 44px; border-radius: 50%; color: #0764c9; background: #e7f1fd; }
 .nav-profile-name { max-width: 155px; overflow: hidden; text-overflow: ellipsis; }
-.nav-profile-chevron { margin-left: 2px; transition: transform .16s ease; }
-.medreach-profile[open] .nav-profile-chevron { transform: rotate(180deg); }
-.medreach-profile-links { position: static; z-index: 1040; min-width: 0; margin: 8px 0 0; padding: 8px; list-style: none; background: #fff; border: 1px solid #dfebf7; border-radius: 18px; }
-.medreach-profile-links :is(a, .nav-account-logout) { display: flex; align-items: center; width: 100%; min-height: 44px; border: 0; border-radius: 10px; padding: 10px 14px; color: #19345b; background: #fff; text-align: left; text-decoration: none; font-size: .9375rem; font-weight: 550; line-height: 1.5; }
-.medreach-profile-links :is(a, .nav-account-logout):hover { background: #edf5ff; color: #075ed7; }
-.medreach-profile-links .nav-account-signout { margin-top: 6px; padding-top: 6px; border-top: 1px solid #e7eef8; }
 @media (min-width: 1400px) {
   .medreach-theme .app-navbar .medreach-nav-shell { grid-template-columns: minmax(0, 1fr) 104px minmax(0, 1.32fr); gap: 0; padding: 0 18px; min-height: 84px; border-radius: 999px; }
   .app-navbar .navbar-brand { grid-column: 2; grid-row: 1; align-self: center; height: 58px; border-inline: 1px solid #eaf0f8; }
@@ -36,8 +28,6 @@
   .app-navbar .nav-link > svg { width: clamp(24px, 1.75vw, 28px); height: clamp(24px, 1.75vw, 28px); }
   .app-navbar .medreach-profile-item { margin-left: 10px; padding-left: 12px; border-left: 1px solid #eaf0f8; }
   .app-navbar .nav-profile { padding: 4px 6px; gap: 10px; }
-  .app-navbar .nav-profile > .nav-profile-chevron { width: 16px; height: 16px; }
-  .medreach-profile-links { position: absolute; right: 0; top: calc(100% + 16px); min-width: 224px; margin: 0; box-shadow: 0 12px 32px rgba(17, 30, 64, .12); }
   .nav-profile-name { max-width: 140px; }
 }
 @media (max-width: 575px) {
@@ -45,7 +35,5 @@
   .medreach-theme .app-navbar .medreach-nav-shell { border-radius: 28px; padding: 6px 12px; }
   .app-navbar .navbar-collapse.show { grid-template-columns: 1fr; max-height: calc(100dvh - 175px); }
   .app-navbar .nav-link { min-height: 48px; }
-  .medreach-profile-links { position: static; margin-top: 8px; min-width: 0; box-shadow: none; background: #f8fbff; }
   .app-navbar .nav-profile { justify-content: flex-start; }
-  .app-navbar .nav-profile-chevron { margin-left: auto; }
 }

@@ -14,7 +14,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   });
 });
 
-test("account theme persists across admin navigation, dashboard and profile", async ({ page }) => {
+test("account theme persists across admin navigation, dashboard and profile", async ({ page }, info) => {
   for (const width of [1466, 390]) {
     await page.setViewportSize({ width, height: 900 });
     for (const path of ["/admin", "/admin/provider-approvals", "/admin/provider-accounts", "/dashboard", "/profile"]) {
@@ -27,7 +27,17 @@ test("account theme persists across admin navigation, dashboard and profile", as
         await expect(page.locator('.admin-section-link[aria-current="page"]')).toHaveAttribute("href", path);
       }
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      if (process.env.MEDREACH_CAPTURE_ACCOUNT === "1" && ["/dashboard", "/profile", "/admin"].includes(path)) {
+        await page.evaluate(() => document.fonts.ready);
+        await page.screenshot({ path: info.outputPath(`bootstrap${path.replaceAll("/", "-")}-${width}.jpg`), type: "jpeg", quality: 82, animations: "disabled" });
+      }
     }
+  }
+  await page.goto("/admin/system-admins");
+  await expect(page.getByRole("heading", { name: "System administrators", exact: true })).toBeVisible();
+  if (process.env.MEDREACH_CAPTURE_ACCOUNT === "1") {
+    await page.evaluate(() => document.fonts.ready);
+    await page.screenshot({ path: info.outputPath("bootstrap-system-admins-390.jpg"), type: "jpeg", quality: 82, animations: "disabled" });
   }
 });
 

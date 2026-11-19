@@ -181,7 +181,7 @@ export async function changeEmergencyRequest({ requestId, actor, trackingToken, 
 export async function listVisibleEmergencyRequests(actor) {
   if (["system_admin"].includes(actor.role)) return EmergencyRequest.find().select("-patientSummary").populate("hospital", "name slug").sort({ createdAt: -1 }).limit(100).lean();
   if (["provider_admin", "hospital_admin"].includes(actor.role)) {
-    const ids = actor.role === "hospital_admin" ? await Hospital.find({ admins: actor.id }).distinct("_id") : actor.hospitalIds || [];
+    const ids = actor.role === "hospital_admin" ? await Hospital.find({ admins: actor.id, archivedAt: null }).distinct("_id") : actor.hospitalIds || [];
     return EmergencyRequest.find({ hospital: { $in: ids } }).populate("hospital", "name slug").sort({ createdAt: -1 }).limit(100).lean();
   }
   return EmergencyRequest.find({ user: actor.id }).populate("hospital", "name slug").sort({ createdAt: -1 }).limit(100).lean();
