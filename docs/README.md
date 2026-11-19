@@ -46,21 +46,14 @@ The recovered workstation database at `/home/anonymous/medreach/data` is not a
 test fixture. Database files, credentials and personal information must remain
 outside version control. Do not reset/reseed it to reproduce a guide.
 
-## Research and historical evidence
+## Engineering evaluation and historical evidence
 
 | Document | Status |
 | --- | --- |
 | [Evaluation tools](../evaluation/README.md) | Reproducible hosted measurements and their limits |
 | [Hosted evaluation](../evaluation/HOSTED_RESULTS.md) | Dated Vercel/Railway observations, Lighthouse scores and passive security evidence |
-| [Research plan](MedReach_Corrected_Plan.md) | Proposed study; not completed empirical findings |
-| [Paper outline](../paper/outline.md) | Proposed structure and evidence requirements |
-| [User study](../user-study/README.md) | Draft protocol; participant recruitment/ethics approval not established |
-| [Task flows](../user-study/protocol/task-flows.md) | Proposed isolated study tasks |
-| [Consent form](../user-study/protocol/consent-form.md) | Draft requiring institutional completion and review |
-| [SUS](../user-study/instruments/sus.md) / [NASA-TLX](../user-study/instruments/nasa-tlx.md) | Draft instruments; no participant results |
 | [React rendering probe](../probe-react/README.md) | Narrow server-rendered escaping experiment |
 | [Assistant smoke tool](../test-bot/README.md) | Manual reachability/reply check with limited assertions |
-| [Preliminary results](RESULTS-prelim.md) | Archived scaffold measurements |
 | [Hospital fusion report](Hospital_Data_Fusion_Verification_Report.md) | Historical acquisition-era evidence; not current runtime architecture |
 
 ## Keep the documentation current

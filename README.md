@@ -174,8 +174,7 @@ packages/core/    Shared frontend client, hooks and data helpers
 variants/         Independent Bootstrap, Tailwind and Skeleton frontends
 tests/            Browser journeys and focused unit tests
 docs/             Architecture, operations, security and verification guides
-evaluation/       Hosted measurements and explicitly scoped research tools
-user-study/       Proposed protocols and draft questionnaires
+evaluation/       Engineering evaluation and release checks
 ```
 
 </details>
@@ -251,8 +250,8 @@ The crawler, Google OAuth, in-app notification inbox, User Admin role and
 `/admin/operations` are intentionally retired. Maps, provider approvals, email
 and the main `/admin` dashboard remain.
 
-Research plans, draft study instruments and historical figures are labelled in
-the [research documentation](evaluation/README.md). The [hosted evaluation](evaluation/HOSTED_RESULTS.md)
+Research drafts, study materials and raw datasets are maintained separately from
+the application repository. The [hosted evaluation](evaluation/HOSTED_RESULTS.md)
 records measured deployment results and their limits. Composite security grades
 remain unmeasured until all required evidence is available.
 

@@ -38,10 +38,14 @@ evaluation/**/results/
 *.zap.json
 lighthouse-*.json
 
-# Human-subjects data — NEVER commit (contains participant info)
-user-study/data/
-user-study/**/recordings/
-user-study/**/*.raw.csv
+# Private research, study materials and evidence
+/research/
+/research-measurements/
+/paper/
+/user-study/
+/docs/research/
+/docs/MedReach_Corrected_Plan.md
+/docs/RESULTS-prelim.md
 
 # Misc, logs & IDE
 .DS_Store
