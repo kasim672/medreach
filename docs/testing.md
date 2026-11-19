@@ -111,9 +111,52 @@ npm run build:variants
 
 ---
 
-## 4. Verified Test Evidence
+## 4. Repeatable stress review
 
-As of October 2026, the complete verification suite demonstrates 100% pass rates:
+Start with the database-backed suite and all three browser projects. They cover
+request transitions, cross-organisation access, duplicate submissions, competing
+bookings, notification recovery, backup verification and mobile interactions.
+Use `npm run backend:test:db` with isolated MongoDB fixtures and `npm run test:e2e`
+with the `medreach_e2e` fixture after building the variants.
+
+Run the sustained rehearsal against an empty isolated MongoDB database. It uses
+two local API processes, six concurrent directory readers, concurrent inventory
+updates and a synthetic worker. Database interruption takes place at the test
+proxy. The fixture disables outbound email and uses no hosted services.
+
+```bash
+MEDREACH_SUSTAINED_MONGO_URI=mongodb://127.0.0.1:27017/medreach_sustained_reliability_test \
+MEDREACH_SUSTAINED_SECONDS=120 \
+npm --workspace @medreach/backend run rehearse:sustained
+```
+
+Keep the JSON report with the revision, fixture size, request counts, latency
+percentiles and recovery outcomes. Local timings describe the fixture and host
+where they were collected. Hosted capacity and live integration delivery need
+separate evidence.
+
+The 19 November 2026 rehearsal used 120 synthetic hospitals and 3,720
+availability observations. Of 6,569 directory reads, 6,527 succeeded and 42
+failed during planned interruptions. All 6,107 reads after recovery succeeded.
+Successful reads measured 27.99 ms p50, 33.96 ms p95 and 38.26 ms p99. One of two
+competing inventory edits committed and the other conflicted. The failed edit
+during the database interruption persisted no change. The restarted worker
+completed 100 jobs with 100 recorded effects, including the reclaimed job.
+
+### Copy-ready review prompt
+
+```text
+Review the current MedReach revision without changing product features. Map each
+finding to a concrete code path and an existing check or a focused regression
+test. Run API, frontend, concurrency and recovery checks with synthetic fixtures
+only. Verify accurate error states, no duplicate effects, and recovery after
+the isolated failure ends. Record the revision, commands, observed metrics,
+failures, retries and coverage gaps. Keep fixes small and evidence-driven.
+```
+
+## 5. Historical test evidence
+
+The following counts were recorded in October 2026:
 
 ```text
 ✓ Backend Database Suites: 352 passing (0 failed, 0 skipped)

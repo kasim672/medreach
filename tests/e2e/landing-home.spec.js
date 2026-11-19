@@ -118,20 +118,23 @@ test("career search uses published API jobs and opens their existing application
 });
 
 test("partial failure retains directory results and targeted retries recover jobs", async ({ page }) => {
-  await page.route(`${API}/api/jobs*`, (route) => route.abort("failed"));
+  let jobsUnavailable = true;
+  let hospitalsUnavailable = false;
+  await page.route(`${API}/api/jobs*`, (route) => jobsUnavailable ? route.abort("failed") : route.continue());
+  await page.route(`${API}/api/hospitals*`, (route) => hospitalsUnavailable ? route.abort("failed") : route.continue());
   await openHome(page);
   await page.locator("#careers").scrollIntoViewIfNeeded();
   const jobs = page.locator(".home-jobs-panel");
   await expect(jobs.getByText("Job listings could not be loaded.", { exact: true })).toBeVisible();
   await expect(directory(page).locator(".home-provider-card")).toHaveCount(5);
-  await page.unroute(`${API}/api/jobs*`);
+  jobsUnavailable = false;
   await jobs.getByRole("button", { name: "Retry jobs", exact: true }).click();
   await expect(jobs.getByRole("link").filter({ hasText: "E2E Emergency Nurse" })).toBeVisible();
-  await page.route(`${API}/api/hospitals*`, (route) => route.abort("failed"));
+  hospitalsUnavailable = true;
   await page.goto("/");
   await expect(directory(page).getByRole("alert")).toContainText("Hospitals could not be loaded");
   await expect(directory(page).locator(".home-provider-card")).toHaveCount(4);
-  await page.unroute(`${API}/api/hospitals*`);
+  hospitalsUnavailable = false;
   await directory(page).getByRole("button", { name: "Retry directory", exact: true }).click();
   await expect(directory(page).getByText("MedReach E2E Hospital", { exact: true })).toBeVisible();
 });

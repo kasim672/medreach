@@ -344,6 +344,7 @@ export async function rehearseSustainedReliability({
           }
         } catch (error) {
           if (error.name === 'AssertionError') throw error;
+          if (status === 200) assert.fail('Directory returned HTTP 200 with an unreadable response body');
         }
         samples.push({
           phase: startedPhase,
@@ -409,7 +410,8 @@ export async function rehearseSustainedReliability({
       recovered = samples.filter(r => r.phase === 'recovered');
     assert.ok(recovered.length > 0 && recovered.every(r => r.status === 200));
     assert.ok(errors.length > 0);
-    assert.ok(samples.filter(r => r.phase === 'healthy' && r.completedPhase === 'healthy').every(r => r.status === 200));
+    const healthy = samples.filter(r => r.phase === 'healthy' && r.completedPhase === 'healthy');
+    assert.ok(healthy.length > 0 && healthy.every(r => r.status === 200));
     const percentile = (rows, p) => {
       const values = rows.map(r => r.ms).sort((a, b) => a - b);
       return +values[Math.min(values.length - 1, Math.floor(values.length * p))].toFixed(2);
