@@ -61,9 +61,9 @@ The final sign-in regression run passed **12 checks per variant**, 36 in all, wi
 
 ## GitHub Actions
 
-Both workflow YAML files parsed with PyYAML. Static checks confirmed read-only contents permissions, pinned action SHAs and no `pull_request_target` trigger. Review included test and build coverage, fixture startup and cleanup, lockfile install, and failed browser artifact capture. `actionlint` and a container runner were unavailable. The local MongoDB 8.0.38 exercises the same release line as the updated CI fixtures, with GitHub service-image execution still unverified.
+Both workflow YAML files parsed with PyYAML. Static checks confirmed read-only contents permissions, pinned action SHAs and no `pull_request_target` trigger. Review included test and build coverage, fixture startup and cleanup, lockfile install, and failed browser artifact capture. `actionlint` and a local container runner were unavailable. The isolated local MongoDB 8.0.38 run exercised the same release line as the updated CI fixtures. Hosted service-image execution is recorded in the release results below.
 
-Hosted checks were read for baseline commit `938f45b` only. All ten returned checks completed successfully, including Critical Browser Journeys, Backend API Tests, lint and units, three builds, RWD scoring and three evaluation checks. No workflow was triggered for these local changes. Hosted workflow and deployment status for the modified tree remain unverified.
+During the baseline phase, hosted checks were read for commit `938f45b`. All ten returned checks completed successfully, including Critical Browser Journeys, Backend API Tests, lint and units, three builds, RWD scoring and three evaluation checks. The later release branch results are recorded separately below.
 
 ## Final verification after the sign-in correction
 
@@ -75,7 +75,7 @@ The five frontend warnings were fixed without disabling the hook rule. Campaign 
 
 Next.js 15.5.29 resolves PostCSS 8.5.28 with the existing override. An offline npm lockfile dry run reported it up to date, and the earlier clean-install and registry-audit results remain applicable to the identical lockfile. The npm dependency-tree diagnostic still compares the overridden version to Next.js's upstream 8.4.31 pin and reports `ELSPROBLEMS`. This pass preserved the override and added no package changes.
 
-`actionlint` was unavailable. Both workflows parsed with PyYAML, all 13 action references used full commit SHAs, every shell step passed `bash -n` after substituting workflow expressions, permissions remained `contents: read`, and neither workflow used `pull_request_target`. This was static local validation. The current working tree has no hosted CI result. The successful GitHub checks above refer only to the older baseline commit.
+`actionlint` was unavailable. Both workflows parsed with PyYAML, all 13 action references used full commit SHAs, every shell step passed `bash -n` after substituting workflow expressions, permissions remained `contents: read`, and neither workflow used `pull_request_target`. These were static local checks. The release branch results below cover execution on GitHub.
 
 The final isolated backend run passed 682 tests with every database gate enabled, zero failures and zero skips. Shared units passed 30/30 and both lint commands reported zero errors and zero warnings. All three production builds passed. The complete browser suites finished on the final sign-in implementation and expanded security checks.
 
@@ -98,3 +98,7 @@ The release branch reran the complete suites after the role-matrix, applicant-re
 | Skeleton | 128 | 0 | 0 | 16 |
 
 The skipped checks are Bootstrap-specific. The database suite confirmed synthetic backup and restore behavior and all three variants passed the new provider self-approval, applicant text-rendering and applicable contrast assertions. See [release verification](medreach-final-security-and-release-verification.md) for the hosted workflow evidence.
+
+## Release branch hosted verification
+
+Both hosted workflows completed successfully on `da630f3974b6fa347726da6b6facfa907c0ca307`, the exact audit code revision pushed to `codex/medreach-final-security-verification`. The CI workflow passed all seven jobs, including the MongoDB 8.0 backup-tool setup and full browser journeys. The hosted logs recorded 682 backend tests, 30 shared unit tests and 400 browser tests passed, with 32 Bootstrap-specific browser skips. The standalone build matrix and the three evaluation jobs also passed. GitHub applied Node 24 to the pinned v4 actions and reported a Node 20 deprecation warning. No browser failure artifacts were generated. [CI run](https://github.com/kasim672/medreach/actions/runs/44779699729) · [Evaluation run](https://github.com/kasim672/medreach/actions/runs/44779699736)
