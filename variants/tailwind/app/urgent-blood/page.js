@@ -1,4 +1,5 @@
 "use client";
+import { saveTrackingToken } from "../../../shared/lib/saveTrackingToken";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { productApi, post } from "../../lib/productApi";
@@ -74,9 +75,7 @@ export default function UrgentBloodPage() {
     try {
       const res = await post("/api/blood-requests/urgent", payload);
       const reference = res.reference || res.bloodRequest?.reference;
-      if (res.trackingToken && reference) {
-        window.sessionStorage.setItem(`medreach:blood-request-token:${reference}`, res.trackingToken);
-      }
+      saveTrackingToken("blood-request", reference, res.trackingToken);
       setSubmittedData({
         reference,
         trackingToken: res.trackingToken,
@@ -101,7 +100,7 @@ export default function UrgentBloodPage() {
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#8f111b] text-white border border-[#ca5b61] mb-1.5">
             Critical Clinical Response
           </span>
-          <h1 className="text-2xl font-extrabold tracking-tight mb-1 text-white">
+          <h1 className="text-2xl font-extrabold tracking-tight mb-1 text-white!">
             Urgent Blood Requisition
           </h1>
           <p className="text-sm text-red-100 max-w-2xl leading-relaxed">
@@ -200,10 +199,10 @@ export default function UrgentBloodPage() {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+                    <label htmlFor="urgent-blood-patient-name" className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
                       Patient Full Name *
                     </label>
-                    <input
+                    <input id="urgent-blood-patient-name"
                       type="text"
                       className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100 transition-all"
                       placeholder="e.g. Ramesh Patel"
@@ -214,10 +213,10 @@ export default function UrgentBloodPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+                    <label htmlFor="urgent-blood-group" className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
                       Blood Group *
                     </label>
-                    <select
+                    <select id="urgent-blood-group"
                       className="w-full rounded-xl border border-red-300 px-4 py-2.5 text-sm font-bold text-red-600 bg-white focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100 transition-all"
                       value={formData.bloodGroup}
                       onChange={(e) => setFormData({ ...formData, bloodGroup: e.target.value })}
@@ -232,11 +231,11 @@ export default function UrgentBloodPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+                    <label htmlFor="urgent-blood-units" className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
                       Units Needed *
                     </label>
                     <div className="flex gap-2">
-                      <input
+                      <input id="urgent-blood-units"
                         type="number"
                         className="w-28 rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-semibold text-gray-900 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100 transition-all"
                         min="1"
@@ -265,10 +264,10 @@ export default function UrgentBloodPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-red-600 mb-1.5">
+                    <label htmlFor="urgent-blood-urgency" className="block text-xs font-bold uppercase tracking-wider text-red-600 mb-1.5">
                       Required Urgency *
                     </label>
-                    <select
+                    <select id="urgent-blood-urgency"
                       className="w-full rounded-xl border border-red-300 px-4 py-2.5 text-sm font-medium text-gray-900 bg-white focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100 transition-all"
                       value={formData.urgency}
                       onChange={(e) => setFormData({ ...formData, urgency: e.target.value })}
@@ -284,10 +283,10 @@ export default function UrgentBloodPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+                    <label htmlFor="urgent-blood-hospital" className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
                       Hospital / Clinic Admitted *
                     </label>
-                    <input
+                    <input id="urgent-blood-hospital"
                       type="text"
                       className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100 transition-all"
                       placeholder="e.g. Lilavati Hospital, Bandra West"
@@ -298,10 +297,10 @@ export default function UrgentBloodPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+                    <label htmlFor="urgent-blood-doctor" className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
                       Treating Doctor / Surgeon
                     </label>
-                    <input
+                    <input id="urgent-blood-doctor"
                       type="text"
                       className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100 transition-all"
                       placeholder="e.g. Dr. Kulkarni (Trauma / ICU)"
@@ -311,10 +310,10 @@ export default function UrgentBloodPage() {
                   </div>
 
                   <div className="md:col-span-2">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+                    <label htmlFor="urgent-blood-bank" className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
                       Target Blood Bank
                     </label>
-                    <select
+                    <select id="urgent-blood-bank"
                       className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 bg-white focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100 transition-all"
                       value={formData.selectedBloodBankId}
                       onChange={(e) => setFormData({ ...formData, selectedBloodBankId: e.target.value })}
@@ -338,10 +337,10 @@ export default function UrgentBloodPage() {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+                    <label htmlFor="urgent-blood-phone" className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
                       Attendant Phone Number *
                     </label>
-                    <input
+                    <input id="urgent-blood-phone"
                       type="tel"
                       className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100 transition-all"
                       placeholder="e.g. +91 98200 11223"
@@ -353,10 +352,10 @@ export default function UrgentBloodPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+                    <label htmlFor="urgent-blood-email" className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
                       Contact Email
                     </label>
-                    <input
+                    <input id="urgent-blood-email"
                       type="email"
                       className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100 transition-all"
                       placeholder="For immediate tracking receipt"
@@ -366,10 +365,10 @@ export default function UrgentBloodPage() {
                   </div>
 
                   <div className="col-span-full">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+                    <label htmlFor="urgent-blood-notes" className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
                       Prescription Notes / Component Details
                     </label>
-                    <textarea
+                    <textarea id="urgent-blood-notes"
                       className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100 transition-all"
                       rows="3"
                       placeholder="Specify components required (e.g. Packed Red Blood Cells, Fresh Frozen Plasma, Single Donor Platelets), cross-matching status, or urgent surgical notes..."

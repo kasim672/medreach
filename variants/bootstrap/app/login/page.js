@@ -8,6 +8,7 @@ export default function LoginPage() {
   const router = useRouter();
   const submitting = useRef(false);
   const [busy, setBusy] = useState(false);
+  const [ready, setReady] = useState(false);
   const { login } = useAuth();
   const [form, setForm] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
@@ -17,6 +18,7 @@ export default function LoginPage() {
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
   useEffect(() => {
+    setReady(true);
     const params = new URLSearchParams(window.location.search);
     setReturnTo(safeReturnTo(params.get("returnTo")));
     if (params.get("registered") === "1") {
@@ -29,7 +31,7 @@ export default function LoginPage() {
 
   const submit = async (e) => {
     e.preventDefault();
-    if (submitting.current) return;
+    if (!ready || submitting.current) return;
     setServerError("");
     setNotice("");
     const check = validateLogin(form);
@@ -58,18 +60,18 @@ export default function LoginPage() {
           <p className="disclaimer mb-3">Sign in to save hospitals for quick access.</p>
           {serverError && <div className="alert alert-danger py-2">{serverError}</div>}
           {notice && <div className="alert alert-success py-2" role="status">{notice}</div>}
-          <form aria-busy={busy} onSubmit={submit} noValidate className="vstack gap-3">
+          <form aria-busy={busy || !ready} onSubmit={submit} noValidate className="vstack gap-3">
             <div>
               <label htmlFor="email" className="form-label fw-semibold">Email</label>
-              <input id="email" type="email" autoComplete="email" className={`form-control ${errors.email ? "is-invalid" : ""}`} value={form.email} onChange={set("email")} />
+              <input id="email" disabled={!ready} type="email" autoComplete="email" className={`form-control ${errors.email ? "is-invalid" : ""}`} value={form.email} onChange={set("email")} />
               {errors.email && <div className="invalid-feedback">{errors.email}</div>}
             </div>
             <div>
               <label htmlFor="password" className="form-label fw-semibold">Password</label>
-              <input id="password" type="password" autoComplete="current-password" className={`form-control ${errors.password ? "is-invalid" : ""}`} value={form.password} onChange={set("password")} />
+              <input id="password" disabled={!ready} type="password" autoComplete="current-password" className={`form-control ${errors.password ? "is-invalid" : ""}`} value={form.password} onChange={set("password")} />
               {errors.password && <div className="invalid-feedback">{errors.password}</div>}
             </div>
-            <button className="btn btn-primary btn-lg" type="submit" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</button>
+            <button className="btn btn-primary btn-lg" type="submit" disabled={busy || !ready}>{busy ? "Signing in…" : "Sign in"}</button>
           </form>
           <p className="text-center mt-3 mb-0"><Link href={`/register?returnTo=${encodeURIComponent(returnTo)}`}>Need an account? Register here</Link></p>
           <p className="text-center mt-2 mb-0"><Link href="/forgot-password">Forgot password?</Link></p>

@@ -84,6 +84,8 @@ test("Provider Admin switches assigned organisations and cannot read reports or 
   const assigned = (await (await page.request.get(`${API}/api/providers/mine`)).json()).data;
   expect(assigned.map(row => row.kind).sort()).toEqual(["blood_bank", "hospital"]);
   const bank = assigned.find(row => row.kind === "blood_bank"), hospital = assigned.find(row => row.kind === "hospital");
+  const ownReport = await page.request.get(`${API}/api/providers/hospital/${hospital._id}/report`);
+  expect(ownReport.status()).toBe(200);
   await page.getByLabel("Assigned organisation", { exact: true }).selectOption(hospital._id);
   await expect(page.getByRole("heading", { name: "Bed requests", exact: true })).toBeVisible();
   await page.getByLabel("Assigned organisation", { exact: true }).selectOption(bank._id);
@@ -100,4 +102,6 @@ test("Provider Admin switches assigned organisations and cannot read reports or 
     }
   }
   expect((await page.request.get(`${API}/api/admin/provider-approvals`)).status()).toBe(403);
+  const ownApproval = await page.request.post(`${API}/api/admin/provider-approvals/organizations/hospital/${hospital._id}/approve`);
+  expect(ownApproval.status()).toBe(403);
 });

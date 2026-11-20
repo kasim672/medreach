@@ -6,13 +6,10 @@ import { Job } from "../backend/src/models/Job.js";
 import { ResourceProvider } from "../backend/src/models/ResourceProvider.js";
 import { User } from "../backend/src/models/User.js";
 
-const uri = process.env.MEDREACH_E2E_MONGO_URI || process.env.MONGO_URI;
-if (!uri) throw new Error("MEDREACH_E2E_MONGO_URI is required");
+import { validateE2eDatabaseTarget } from "./e2e-database-target.mjs";
 
-const databaseName = new URL(uri).pathname.slice(1);
-if (!databaseName.toLowerCase().includes("e2e")) {
-  throw new Error(`Refusing to reset non-E2E database: ${databaseName || "<missing>"}`);
-}
+const uri = process.env.MEDREACH_E2E_MONGO_URI;
+const databaseName = validateE2eDatabaseTarget(uri);
 
 const password = "E2E_SafePassword_123!";
 const variants = ["bootstrap", "tailwind", "skeleton"];

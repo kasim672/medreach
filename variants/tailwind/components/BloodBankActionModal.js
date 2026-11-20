@@ -1,4 +1,5 @@
 "use client";
+import { saveTrackingToken } from "../../shared/lib/saveTrackingToken";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -62,9 +63,7 @@ export default function BloodBankActionModal({ bloodBank, onClose }) {
       };
       const res = await post("/api/blood-requests/standard", payload);
       const reference = res.reference || res.bloodRequest?.reference;
-      if (res.trackingToken && reference) {
-        window.sessionStorage.setItem(`medreach:blood-request-token:${reference}`, res.trackingToken);
-      }
+      saveTrackingToken("blood-request", reference, res.trackingToken);
       setSubmittedData({
         type: "REQUEST",
         reference,
@@ -103,9 +102,7 @@ export default function BloodBankActionModal({ bloodBank, onClose }) {
       };
       const res = await post("/api/blood-requests/standard", payload);
       const reference = res.reference || res.bloodRequest?.reference;
-      if (res.trackingToken && reference) {
-        window.sessionStorage.setItem(`medreach:blood-request-token:${reference}`, res.trackingToken);
-      }
+      saveTrackingToken("blood-request", reference, res.trackingToken);
       setSubmittedData({
         type: "DONATION",
         reference,

@@ -21,10 +21,11 @@ test("login gives immediate feedback, prevents duplicates and shares the returne
   const before = reads;
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page.getByRole("button", { name: "Signing in…", exact: true })).toBeDisabled();
+  await expect.poll(() => logins).toBe(1);
   await page.locator("form").evaluate((form) => form.requestSubmit());
-  expect(logins).toBe(1);
   finish();
   await expect(page).toHaveURL(/\/careers$/);
+  expect(logins).toBe(1);
   expect(reads).toBe(before);
 });
 
@@ -43,4 +44,17 @@ test("invalid credentials show the error without attempting a token refresh", as
   await expect(page.getByText("Invalid email or password", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Sign in", exact: true })).toBeEnabled();
   expect(refreshes).toBe(0);
+});
+
+test("server-rendered sign-in waits for browser form handlers", async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ baseURL, javaScriptEnabled: false });
+  try {
+    const page = await context.newPage();
+    await page.goto("/login");
+    await expect(page.getByLabel("Email", { exact: true })).toBeDisabled();
+    await expect(page.getByLabel("Password", { exact: true })).toBeDisabled();
+    await expect(page.getByRole("button", { name: "Sign in", exact: true })).toBeDisabled();
+  } finally {
+    await context.close();
+  }
 });

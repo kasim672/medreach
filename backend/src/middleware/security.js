@@ -14,7 +14,11 @@ const PRIVATE_API_PATH = /^\/api\/(?:auth|emergency-requests|blood-requests|trac
 function csrfOriginGuard(req, res, next) {
   if (["GET", "HEAD", "OPTIONS"].includes(req.method) || !req.headers.cookie) return next();
   const origin = req.get("origin");
-  if (!origin || ALLOWED_ORIGINS.includes(origin)) return next();
+  // The origin allowlist covers cross-origin app clients. Fetch Metadata covers
+  // originless browser requests while preserving headerless API clients.
+  if (origin ? ALLOWED_ORIGINS.includes(origin) : !["cross-site", "same-site"].includes(req.get("sec-fetch-site"))) {
+    return next();
+  }
   return res.status(403).json({ error: "Request origin not allowed" });
 }
 

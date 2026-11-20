@@ -43,6 +43,11 @@ test("admin role groups paginate accounts without disclosing credential material
   assert.notEqual(first.body.data[0]._id, second.body.data[0]._id);
   assert.equal((await request(app).get("/api/admin/users?roleGroup=forged").set("Authorization", `Bearer ${token}`)).status, 400);
   assert.equal((await request(app).get("/api/admin/users?page=1.5").set("Authorization", `Bearer ${token}`)).status, 400);
-  const ordinary = await signSessionToken(records[0]);
-  assert.equal((await request(app).get("/api/admin/users?roleGroup=system_admin").set("Authorization", `Bearer ${ordinary}`)).status, 403);
+  const platformAccounts = "/api/admin/users?roleGroup=system_admin";
+  for (const [account, expected] of [[records[0], 403], [records[1], 403], [records[3], 200]]) {
+    const session = await signSessionToken(account);
+    const result = await request(app).get(platformAccounts).set("Authorization", `Bearer ${session}`);
+    assert.equal(result.status, expected, account.role);
+  }
+  assert.equal((await request(app).get(platformAccounts)).status, 401);
 });

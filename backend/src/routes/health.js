@@ -3,6 +3,12 @@ import mongoose from "mongoose";
 import { databaseReady } from "../services/backendOperations.js";
 
 const router = Router();
+
+router.use((_req, res, next) => {
+  res.set("Cache-Control", "no-store");
+  next();
+});
+
 const dbState = () =>
   ["disconnected", "connected", "connecting", "disconnecting"][mongoose.connection.readyState] || "unknown";
 

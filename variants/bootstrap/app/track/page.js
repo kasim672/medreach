@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@medreach/core";
 import { productApi } from "../../lib/productApi";
@@ -13,6 +13,7 @@ const tokenKey = (kind, reference) => kind === "diagnostic" ? `medreach:diagnost
 
 export default function TrackRequestPage() {
   const { user } = useAuth();
+  const userId = user?._id || user?.id;
   const [type, setType] = useState("blood");
   const [reference, setReference] = useState("");
   const [record, setRecord] = useState(null);
@@ -24,7 +25,7 @@ export default function TrackRequestPage() {
   const initialized = useRef(false);
   const linkCredentials = useRef(new Map());
 
-  async function load(kind, ref) {
+  const load = useCallback(async (kind, ref) => {
     const cleanReference = ref.trim().toUpperCase();
     if (!cleanReference) return;
     const check = ++sequence.current;
@@ -44,7 +45,7 @@ export default function TrackRequestPage() {
       if (!token) {
         try { token = window.sessionStorage.getItem(tokenKey(kind, cleanReference)); } catch { /* Link credentials still work without browser storage. */ }
       }
-      if (token || user) {
+      if (token || userId) {
         const path = kind === "ambulance"
           ? `/api/ambulances/bookings/${encodeURIComponent(cleanReference)}`
           : kind === "diagnostic" ? `/api/diagnostics/requests/${encodeURIComponent(cleanReference)}`
@@ -64,7 +65,7 @@ export default function TrackRequestPage() {
     } finally {
       if (check === sequence.current) setLoading(false);
     }
-  }
+  }, [userId]);
 
   useEffect(() => {
     if (!initialized.current) {
@@ -88,7 +89,7 @@ export default function TrackRequestPage() {
       load(lookup.current.kind, lookup.current.reference);
     }
     return () => { sequence.current += 1; };
-  }, [user?._id || user?.id]);
+  }, [load]);
 
   const resetResult = () => {
     sequence.current += 1;

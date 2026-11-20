@@ -203,7 +203,7 @@ export default function NewRequest() {
             <Link href={loginHref} className="inline-flex items-center font-bold text-sm rounded-[var(--radius)] bg-blue-600 text-white px-3 py-1.5 hover:bg-blue-700 no-underline">
               Sign in to your account
             </Link>
-            <Link href="/register" className="inline-flex items-center font-semibold text-sm rounded-[var(--radius)] border border-gray-300 bg-white text-gray-700 px-3 py-1.5 hover:bg-gray-50 no-underline">
+            <Link href={`/register?returnTo=${encodeURIComponent(returnPath)}`} className="inline-flex items-center font-semibold text-sm rounded-[var(--radius)] border border-gray-300 bg-white text-gray-700 px-3 py-1.5 hover:bg-gray-50 no-underline">
               Register new account
             </Link>
           </div>

@@ -1,4 +1,5 @@
 "use client";
+import { saveTrackingToken } from "../../../shared/lib/saveTrackingToken";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { productApi, post } from "../../lib/productApi";
@@ -73,9 +74,7 @@ export default function UrgentBloodPage() {
     try {
       const res = await post("/api/blood-requests/urgent", payload);
       const reference = res.reference || res.bloodRequest?.reference;
-      if (res.trackingToken && reference) {
-        window.sessionStorage.setItem(`medreach:blood-request-token:${reference}`, res.trackingToken);
-      }
+      saveTrackingToken("blood-request", reference, res.trackingToken);
       setSubmittedData({
         reference,
         trackingToken: res.trackingToken,
@@ -193,8 +192,8 @@ export default function UrgentBloodPage() {
               <h2 className="h5 fw-bold mb-3 border-bottom pb-2">1. Patient & Medical Details</h2>
               <div className="row g-3 mb-4">
                 <div className="col-md-6">
-                  <label className="form-label fw-semibold">Patient Full Name *</label>
-                  <input
+                  <label htmlFor="urgent-blood-patient-name" className="form-label fw-semibold">Patient Full Name *</label>
+                  <input id="urgent-blood-patient-name"
                     type="text"
                     className="form-control"
                     placeholder="e.g. Ramesh Patel"
@@ -205,8 +204,8 @@ export default function UrgentBloodPage() {
                 </div>
 
                 <div className="col-md-3">
-                  <label className="form-label fw-semibold">Blood Group *</label>
-                  <select
+                  <label htmlFor="urgent-blood-group" className="form-label fw-semibold">Blood Group *</label>
+                  <select id="urgent-blood-group"
                     className="form-select fw-bold text-danger"
                     value={formData.bloodGroup}
                     onChange={(e) => setFormData({ ...formData, bloodGroup: e.target.value })}
@@ -221,9 +220,9 @@ export default function UrgentBloodPage() {
                 </div>
 
                 <div className="col-md-3">
-                  <label className="form-label fw-semibold">Units Needed *</label>
+                  <label htmlFor="urgent-blood-units" className="form-label fw-semibold">Units Needed *</label>
                   <div className="input-group">
-                    <input
+                    <input id="urgent-blood-units"
                       type="number"
                       className="form-control"
                       min="1"
@@ -248,8 +247,8 @@ export default function UrgentBloodPage() {
                 </div>
 
                 <div className="col-md-6">
-                  <label className="form-label fw-semibold text-danger">Required Urgency *</label>
-                  <select
+                  <label htmlFor="urgent-blood-urgency" className="form-label fw-semibold text-danger">Required Urgency *</label>
+                  <select id="urgent-blood-urgency"
                     className="form-select border-danger"
                     value={formData.urgency}
                     onChange={(e) => setFormData({ ...formData, urgency: e.target.value })}
@@ -265,8 +264,8 @@ export default function UrgentBloodPage() {
                 </div>
 
                 <div className="col-md-6">
-                  <label className="form-label fw-semibold">Hospital / Clinic Admitted *</label>
-                  <input
+                  <label htmlFor="urgent-blood-hospital" className="form-label fw-semibold">Hospital / Clinic Admitted *</label>
+                  <input id="urgent-blood-hospital"
                     type="text"
                     className="form-control"
                     placeholder="e.g. Lilavati Hospital, Bandra West"
@@ -277,8 +276,8 @@ export default function UrgentBloodPage() {
                 </div>
 
                 <div className="col-md-6">
-                  <label className="form-label fw-semibold">Treating Doctor / Surgeon</label>
-                  <input
+                  <label htmlFor="urgent-blood-doctor" className="form-label fw-semibold">Treating Doctor / Surgeon</label>
+                  <input id="urgent-blood-doctor"
                     type="text"
                     className="form-control"
                     placeholder="e.g. Dr. Kulkarni (Trauma / ICU)"
@@ -288,8 +287,8 @@ export default function UrgentBloodPage() {
                 </div>
 
                 <div className="col-md-6">
-                  <label className="form-label fw-semibold">Target Blood Bank</label>
-                  <select
+                  <label htmlFor="urgent-blood-bank" className="form-label fw-semibold">Target Blood Bank</label>
+                  <select id="urgent-blood-bank"
                     className="form-select"
                     value={formData.selectedBloodBankId}
                     onChange={(e) => setFormData({ ...formData, selectedBloodBankId: e.target.value })}
@@ -308,8 +307,8 @@ export default function UrgentBloodPage() {
               <h2 className="h5 fw-bold mb-3 border-bottom pb-2">2. Emergency Contact Information</h2>
               <div className="row g-3 mb-4">
                 <div className="col-md-6">
-                  <label className="form-label fw-semibold">Attendant / Contact Phone Number *</label>
-                  <input
+                  <label htmlFor="urgent-blood-phone" className="form-label fw-semibold">Attendant / Contact Phone Number *</label>
+                  <input id="urgent-blood-phone"
                     type="tel"
                     className="form-control"
                     placeholder="e.g. +91 98200 11223"
@@ -321,8 +320,8 @@ export default function UrgentBloodPage() {
                 </div>
 
                 <div className="col-md-6">
-                  <label className="form-label fw-semibold">Contact Email</label>
-                  <input
+                  <label htmlFor="urgent-blood-email" className="form-label fw-semibold">Contact Email</label>
+                  <input id="urgent-blood-email"
                     type="email"
                     className="form-control"
                     placeholder="For immediate tracking receipt"
@@ -332,8 +331,8 @@ export default function UrgentBloodPage() {
                 </div>
 
                 <div className="col-12">
-                  <label className="form-label fw-semibold">Prescription Notes / Component Details</label>
-                  <textarea
+                  <label htmlFor="urgent-blood-notes" className="form-label fw-semibold">Prescription Notes / Component Details</label>
+                  <textarea id="urgent-blood-notes"
                     className="form-control"
                     rows="3"
                     placeholder="Specify components required (e.g. Packed Red Blood Cells, Fresh Frozen Plasma, Single Donor Platelets), cross-matching status, or urgent surgical notes..."

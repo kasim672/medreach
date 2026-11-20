@@ -1,3 +1,4 @@
+import { safeErrorMetadata } from "../../utils/logRedaction.js";
 // Optional external AI provider (Google Gemini).
 // Grounded strictly in real data provided by assistantService.
 
@@ -76,10 +77,9 @@ export async function generateReply(context) {
       }
     );
   } catch (err) {
-    if (err?.name === "AbortError") {
-      throw new Error("AI provider request timed out");
-    }
-    throw new Error("AI provider request failed");
+    const message = err?.name === "AbortError" ? "AI provider request timed out" : "AI provider request failed";
+    // eslint-disable-next-line preserve-caught-error -- Raw provider errors may expose request credentials.
+    throw new Error(message, { cause: safeErrorMetadata(err) });
   } finally {
     clearTimeout(timeout);
   }

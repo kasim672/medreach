@@ -69,6 +69,12 @@ PRIVATE.md
 # documentation entry points, diagrams, schemas, and screenshots.
 /docs/*
 !/docs/README.md
+!/docs/audits/
+/docs/audits/*
+!/docs/audits/*.md
+!/docs/audits/evidence/
+/docs/audits/evidence/*
+!/docs/audits/evidence/*-urgent-blood-mobile.png
 !/docs/database-schema.md
 !/docs/testing.md
 !/docs/testing/

@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import BookingDialog from "../../shared/components/BookingDialog";
+import { saveTrackingToken } from "../../shared/lib/saveTrackingToken";
+import { useState, useEffect, useRef } from "react";
 import EmergencyIcon from "./EmergencyIcons";
 import { useAuth } from "@medreach/core";
 import { post } from "../lib/productApi";
@@ -21,13 +23,13 @@ export default function AmbulanceBookingModal({ provider, onClose }) {
   const [successMsg, setSuccessMsg] = useState("");
   const [tracking, setTracking] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const pending = useRef(false);
 
   useEffect(() => {
-    if (user?.email && !contactEmail) setContactEmail(user.email);
-    if ((user?.emergencyContact || user?.phone) && !contactPhone) {
-      setContactPhone(user.emergencyContact || user.phone);
-    }
-  }, [user]);
+    if (user?.email) setContactEmail((current) => current || user.email);
+    const phone = user?.emergencyContact || user?.phone;
+    if (phone) setContactPhone((current) => current || phone);
+  }, [user?.email, user?.emergencyContact, user?.phone]);
 
   const validate = () => {
     if (!patientName.trim()) return "Patient Name is required";
@@ -39,12 +41,14 @@ export default function AmbulanceBookingModal({ provider, onClose }) {
 
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
+    if (pending.current || successMsg) return;
     const validationError = validate();
     if (validationError) {
       setErrorMsg(validationError);
       return;
     }
     setErrorMsg("");
+    pending.current = true;
     setSubmitting(true);
     try {
       const res = await post("/api/ambulances/book", {
@@ -59,9 +63,7 @@ export default function AmbulanceBookingModal({ provider, onClose }) {
         contactEmail: contactEmail.trim() || undefined,
         contactPhone: contactPhone.trim() || undefined,
       });
-      if (res.trackingToken) {
-        window.sessionStorage.setItem(`medreach:ambulance-booking-token:${res.reference}`, res.trackingToken);
-      }
+      saveTrackingToken("ambulance-booking", res.reference, res.trackingToken);
       const delivery = res.delivery?.provider;
       let providerMessage;
       if (delivery?.status === "pending") {
@@ -78,17 +80,17 @@ export default function AmbulanceBookingModal({ provider, onClose }) {
     } catch (err) {
       setErrorMsg(err.message || "Failed to submit ambulance booking. Please try again.");
     } finally {
+      pending.current = false;
       setSubmitting(false);
     }
   };
 
   return (
-    <div
+    <BookingDialog
       className="modal-overlay"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="skeleton-ambulance-booking-title"
+      onClose={onClose}
+      busy={submitting}
+      labelledBy="skeleton-ambulance-booking-title"
       style={{ zIndex: 1060 }}
     >
       <div
@@ -110,7 +112,7 @@ export default function AmbulanceBookingModal({ provider, onClose }) {
           </div>
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => { if (!submitting) onClose(); }}
             className="btn-close"
             aria-label="Close"
           >
@@ -136,7 +138,7 @@ export default function AmbulanceBookingModal({ provider, onClose }) {
             {tracking && <div className="mb-3"><a href={`/track?type=ambulance&reference=${encodeURIComponent(tracking.reference)}${tracking.token ? `#token=${encodeURIComponent(tracking.token)}` : ""}`} className="btn btn-sm btn-outline-danger">Track request</a></div>}
             <button
               type="button"
-              onClick={onClose}
+              onClick={() => { if (!submitting) onClose(); }}
               className="btn btn-sm btn-outline-secondary"
             >
               Done
@@ -239,7 +241,7 @@ export default function AmbulanceBookingModal({ provider, onClose }) {
               <button
                 type="button"
                 className="btn btn-sm btn-outline-secondary"
-                onClick={onClose}
+                onClick={() => { if (!submitting) onClose(); }}
               >
                 Cancel
               </button>
@@ -254,6 +256,6 @@ export default function AmbulanceBookingModal({ provider, onClose }) {
           </form>
         )}
       </div>
-    </div>
+    </BookingDialog>
   );
 }

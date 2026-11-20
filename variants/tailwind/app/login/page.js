@@ -11,6 +11,7 @@ export default function LoginPage() {
   const router = useRouter();
   const submitting = useRef(false);
   const [busy, setBusy] = useState(false);
+  const [ready, setReady] = useState(false);
   const { login } = useAuth();
   const [form, setForm] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
@@ -20,6 +21,7 @@ export default function LoginPage() {
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
   useEffect(() => {
+    setReady(true);
     const params = new URLSearchParams(window.location.search);
     const candidate = params.get("returnTo");
     setReturnTo(safeReturnTo(candidate));
@@ -33,7 +35,7 @@ export default function LoginPage() {
 
   const submit = async (e) => {
     e.preventDefault();
-    if (submitting.current) return;
+    if (!ready || submitting.current) return;
     setServerError("");
     setNotice("");
     const check = validateLogin(form);
@@ -62,18 +64,18 @@ export default function LoginPage() {
           <p className="text-[.78rem] text-[var(--color-muted)] mb-3">Sign in to save hospitals for quick access.</p>
           {serverError && <div className="rounded bg-[var(--color-danger-bg)] text-[var(--color-danger)] px-3 py-2 mb-3">{serverError}</div>}
           {notice && <div className="rounded bg-green-50 border border-green-200 text-green-800 px-3 py-2 mb-3" role="status">{notice}</div>}
-          <form aria-busy={busy} onSubmit={submit} noValidate className="flex flex-col gap-3">
+          <form aria-busy={busy || !ready} onSubmit={submit} noValidate className="flex flex-col gap-3">
             <div>
               <label htmlFor="email" className="block font-semibold mb-1">Email</label>
-              <input id="email" type="email" autoComplete="email" className={`${control} ${errors.email ? controlInvalid : ""}`} value={form.email} onChange={set("email")} />
+              <input id="email" disabled={!ready} type="email" autoComplete="email" className={`${control} ${errors.email ? controlInvalid : ""}`} value={form.email} onChange={set("email")} />
               {errors.email && <div className="text-[var(--color-danger)] text-sm mt-1">{errors.email}</div>}
             </div>
             <div>
               <label htmlFor="password" className="block font-semibold mb-1">Password</label>
-              <input id="password" type="password" autoComplete="current-password" className={`${control} ${errors.password ? controlInvalid : ""}`} value={form.password} onChange={set("password")} />
+              <input id="password" disabled={!ready} type="password" autoComplete="current-password" className={`${control} ${errors.password ? controlInvalid : ""}`} value={form.password} onChange={set("password")} />
               {errors.password && <div className="text-[var(--color-danger)] text-sm mt-1">{errors.password}</div>}
             </div>
-            <button className="inline-flex items-center justify-center font-bold text-lg rounded-[var(--radius)] bg-[var(--color-emergency)] text-white px-4 py-2 hover:bg-[var(--color-emergency-dark)]" type="submit" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</button>
+            <button className="inline-flex items-center justify-center font-bold text-lg rounded-[var(--radius)] bg-[var(--color-emergency)] text-white px-4 py-2 hover:bg-[var(--color-emergency-dark)]" type="submit" disabled={busy || !ready}>{busy ? "Signing in…" : "Sign in"}</button>
           </form>
           <p className="text-center text-sm mt-2 mb-0"><Link href={`/register?returnTo=${encodeURIComponent(returnTo)}`} className="text-[var(--color-emergency-dark)] underline">Need an account? Register here</Link></p>
           <p className="text-center text-sm mt-2 mb-0"><Link href="/forgot-password" className="text-[var(--color-emergency-dark)] underline">Forgot password?</Link></p>

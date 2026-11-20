@@ -102,8 +102,8 @@ cache is introduced. See [measurements](latency-verification.md).
 
 ## Intentional differences and limitations
 
-Bootstrap has the local manual credential handover UI. Tailwind and Skeleton
-retain email-invitation administration. These are not identical interfaces.
+Manual credential handover follows the same backend policy in all three variants.
+Each variant retains its framework styling and some presentation differences.
 See [parity scope](PARITY_VERIFICATION.md).
 
 The local standalone database does not make every multi-document workflow

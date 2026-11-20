@@ -195,11 +195,11 @@ export default function NewRequest() {
             Standard hospital bed requests require a verified user account so the hospital can safely review patient records
             and confirm admissions.
           </p>
-          <div className="flex gap-2 items-center">
+          <div className="flex flex-wrap gap-2 items-center">
             <Link href={loginHref} className="btn btn-sm btn-primary">
               Sign in to your account
             </Link>
-            <Link href="/register" className="btn btn-sm btn-outline-secondary">
+            <Link href={`/register?returnTo=${encodeURIComponent(returnPath)}`} className="btn btn-sm btn-outline-secondary">
               Register new account
             </Link>
           </div>
@@ -246,7 +246,7 @@ export default function NewRequest() {
         </div>
 
         {/* Emergency Type & Required Facility */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "0.75rem" }}>
           <div>
             <label className="form-label fw-bold small mb-1" htmlFor="emergencyType">
               {isEmergency ? "Emergency Category" : "Admission / Care Reason"} <span className="text-danger">*</span>
@@ -284,7 +284,7 @@ export default function NewRequest() {
         </div>
 
         {/* Contact Phone & Email */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "0.75rem" }}>
           <div>
             <label className="form-label fw-bold small mb-1 flex items-center gap-1" htmlFor="phone">
               <EmergencyIcon name="phone" size={14} /> Contact Phone <span className="text-danger">*</span>
@@ -323,7 +323,7 @@ export default function NewRequest() {
         </div>
 
         {/* Locality & Age Group */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "0.75rem" }}>
           <div>
             <label className="form-label fw-bold small mb-1 flex items-center gap-1" htmlFor="locality">
               <EmergencyIcon name="pin" size={14} /> Current Locality
@@ -427,7 +427,7 @@ export default function NewRequest() {
         {/* Submit Action */}
         <div style={{ borderTop: "1px solid #e9ecef", paddingTop: "0.75rem" }}>
           {!isEmergency && !user ? (
-            <button type="button" className="btn btn-secondary w-100" style={{ width: "100%", opacity: 0.6, cursor: "not-allowed" }} disabled>
+            <button type="button" className="btn btn-secondary w-100" style={{ width: "100%", whiteSpace: "normal", opacity: 0.6, cursor: "not-allowed" }} disabled>
               Sign in to submit hospital admission request
             </button>
           ) : (
@@ -436,6 +436,7 @@ export default function NewRequest() {
               className={`btn ${isEmergency ? "btn-primary" : "btn-outline-secondary"}`}
               style={{
                 width: "100%",
+                whiteSpace: "normal",
                 padding: "0.75rem",
                 fontWeight: "bold",
                 backgroundColor: isEmergency ? "var(--color-emergency)" : undefined,

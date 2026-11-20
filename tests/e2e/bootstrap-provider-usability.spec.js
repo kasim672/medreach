@@ -49,7 +49,7 @@ test("provider can find drafts, submit for review and clear a successfully saved
   await expect(page.getByRole("article", { name: "Published technician", exact: true })).toHaveCount(0);
   const card = page.getByRole("article", { name: draft.title, exact: true });
   await card.getByRole("button", { name: "Submit for review", exact: true }).click();
-  expect(state.submitted).toEqual({ status: "published" });
+  await expect.poll(() => state.submitted).toEqual({ status: "published" });
   await page.getByLabel("Listing status", { exact: true }).selectOption("pending");
   await expect(card).toContainText("Awaiting review");
   await expect(card).toContainText("This role is not public yet");

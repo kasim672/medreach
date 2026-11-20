@@ -14,7 +14,13 @@ test("frontend pages enforce framing and MIME protections without blocking their
     expect(headers["x-frame-options"]).toBe("DENY");
     expect(headers["x-content-type-options"]).toBe("nosniff");
     expect(headers["referrer-policy"]).toBe("no-referrer");
-    expect(headers["content-security-policy"]).toContain("frame-ancestors 'none'");
+    const directives = headers["content-security-policy"].split(";").map((value) => value.trim());
+    expect(directives).toEqual(expect.arrayContaining([
+      "frame-ancestors 'none'", "object-src 'none'", "base-uri 'self'", "form-action 'self'",
+    ]));
+    expect(headers["strict-transport-security"]).toMatch(/^max-age=\d+;.*includeSubDomains/);
+    expect(headers["permissions-policy"]).toContain("camera=(), microphone=()");
+    expect(headers["x-powered-by"]).toBeUndefined();
     await expect(page.locator("#main")).toBeVisible();
   }
 });
@@ -26,6 +32,7 @@ test("staff cannot open unsafe legacy resume links while PDF downloads remain av
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL(/\/hospital\/jobs$/);
   const jobId = "507f1f77bcf86cd799439011";
+  const inertName = "Valid PDF <medreach-audit-marker>";
   // These are explicit legacy security fixtures, never persisted as live provider data.
   await page.route(`${API}/api/jobs/manage`, (route) => route.fulfill({ json: { data: [{
     _id: jobId, title: "Resume security fixture", status: "published", category: "Nurse", employmentType: "full_time",
@@ -33,11 +40,27 @@ test("staff cannot open unsafe legacy resume links while PDF downloads remain av
   }] } }));
   await page.route(`${API}/api/jobs/${jobId}/applications`, (route) => route.fulfill({ json: { data: [
     { _id: "507f1f77bcf86cd799439012", candidateName: "Unsafe legacy document", status: "submitted", resume: { fileUrl: "data:text/html;base64,PHNjcmlwdD4=", fileName: "unsafe.html" } },
-    { _id: "507f1f77bcf86cd799439013", candidateName: "Valid PDF document", status: "submitted", resume: { fileUrl: "data:application/pdf;base64,JVBERi0xLjQK", fileName: "cv.pdf" } },
+    { _id: "507f1f77bcf86cd799439013", candidateName: inertName, status: "submitted", resume: { fileUrl: "data:application/pdf;base64,JVBERi0xLjQK", fileName: "cv.pdf" } },
   ] } }));
   await page.reload();
   await page.getByRole("button", { name: "Review Applicants", exact: true }).click();
   await expect(page.getByText("Unsafe legacy document", { exact: true })).toBeVisible();
   await expect(page.locator('a[href^="data:text/html"]')).toHaveCount(0);
   await expect(page.locator('a[href^="data:application/pdf"]')).toHaveCount(1);
+  await expect(page.getByText(inertName, { exact: true })).toBeVisible();
+  await expect(page.locator("medreach-audit-marker")).toHaveCount(0);
+});
+
+test("browser API responses retain API CSP and private caching policy", async ({ page }) => {
+  const publicResponse = await page.goto(`${API}/health/live`);
+  expect(publicResponse.status()).toBe(200);
+  const headers = publicResponse.headers();
+  expect(headers["cache-control"]).toBe("no-store");
+  expect(headers["x-content-type-options"]).toBe("nosniff");
+  const directives = headers["content-security-policy"].split(";").map((value) => value.trim());
+  expect(directives).toEqual(expect.arrayContaining(["default-src 'self'", "script-src 'self'", "frame-ancestors 'none'"]));
+
+  const privateResponse = await page.goto(`${API}/api/auth/me`);
+  expect(privateResponse.status()).toBe(401);
+  expect(privateResponse.headers()["cache-control"]).toBe("no-store");
 });

@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
+import { validateE2eDatabaseTarget } from "./scripts/e2e-database-target.mjs";
 
-const mongoUri = process.env.MEDREACH_E2E_MONGO_URI || "mongodb://127.0.0.1:27017/medreach_e2e";
+const mongoUri = process.env.MEDREACH_E2E_MONGO_URI;
+validateE2eDatabaseTarget(mongoUri);
 const apiPort = Number(process.env.MEDREACH_E2E_API_PORT || 4000);
 const apiUrl = `http://localhost:${apiPort}`;
 const bootstrapPort = Number(process.env.MEDREACH_BOOTSTRAP_E2E_PORT || 3000);

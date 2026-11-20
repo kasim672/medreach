@@ -1,5 +1,7 @@
 "use client";
-import { useState, useEffect } from "react";
+import BookingDialog from "../../shared/components/BookingDialog";
+import { saveTrackingToken } from "../../shared/lib/saveTrackingToken";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@medreach/core";
 import { post } from "../lib/productApi";
 
@@ -19,11 +21,13 @@ export default function AmbulanceBookingModal({ provider, onClose }) {
   const [successMsg, setSuccessMsg] = useState("");
   const [tracking, setTracking] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const pending = useRef(false);
 
   useEffect(() => {
-    if (user?.email && !contactEmail) setContactEmail(user.email);
-    if ((user?.emergencyContact || user?.phone) && !contactPhone) setContactPhone(user.emergencyContact || user.phone);
-  }, [user]);
+    if (user?.email) setContactEmail((current) => current || user.email);
+    const phone = user?.emergencyContact || user?.phone;
+    if (phone) setContactPhone((current) => current || phone);
+  }, [user?.email, user?.emergencyContact, user?.phone]);
 
   const validate = () => {
     if (!patientName.trim()) return "Patient Name is required";
@@ -34,12 +38,14 @@ export default function AmbulanceBookingModal({ provider, onClose }) {
   };
 
   const handleSubmit = async () => {
+    if (pending.current || successMsg) return;
     const validationError = validate();
     if (validationError) {
       setErrorMsg(validationError);
       return;
     }
     setErrorMsg("");
+    pending.current = true;
     setSubmitting(true);
     try {
       const res = await post("/api/ambulances/book", {
@@ -54,9 +60,7 @@ export default function AmbulanceBookingModal({ provider, onClose }) {
         contactEmail: contactEmail.trim() || undefined,
         contactPhone: contactPhone.trim() || undefined,
       });
-      if (res.trackingToken) {
-        window.sessionStorage.setItem(`medreach:ambulance-booking-token:${res.reference}`, res.trackingToken);
-      }
+      saveTrackingToken("ambulance-booking", res.reference, res.trackingToken);
       const delivery = res.delivery?.provider;
       let providerMessage;
       if (delivery?.status === "pending") {
@@ -73,17 +77,17 @@ export default function AmbulanceBookingModal({ provider, onClose }) {
     } catch (err) {
       setErrorMsg(err.message || "Failed to submit ambulance booking. Please try again.");
     } finally {
+      pending.current = false;
       setSubmitting(false);
     }
   };
 
   return (
-    <div
+    <BookingDialog
       className="modal-overlay"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="ambulance-booking-title"
+      onClose={onClose}
+      busy={submitting}
+      labelledBy="ambulance-booking-title"
       style={{
         position: "fixed",
         inset: 0,
@@ -213,7 +217,7 @@ export default function AmbulanceBookingModal({ provider, onClose }) {
             />
           </div>
           <div className="col-12 d-flex justify-content-end gap-2 mt-3">
-            <button type="button" className="btn btn-outline-secondary" onClick={onClose} disabled={submitting}>
+            <button type="button" className="btn btn-outline-secondary" onClick={() => { if (!submitting) onClose(); }} disabled={submitting}>
               Cancel
             </button>
             <button
@@ -227,6 +231,6 @@ export default function AmbulanceBookingModal({ provider, onClose }) {
           </div>
         </form>
       </div>
-    </div>
+    </BookingDialog>
   );
 }

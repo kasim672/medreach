@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import ResourceDirectory from "../../components/ResourceDirectory";
 import BloodBankActionModal from "../../components/BloodBankActionModal";
 import { productApi, post } from "../../lib/productApi";
@@ -36,14 +36,7 @@ export default function BloodBanks() {
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchCampaigns();
-    if (isAdmin) {
-      fetchPendingCampaigns();
-    }
-  }, [filterGroup, filterStatus, isAdmin]);
-
-  const fetchCampaigns = async () => {
+  const fetchCampaigns = useCallback(async () => {
     try {
       let query = `?status=${filterStatus}`;
       if (filterGroup) query += `&bloodGroup=${encodeURIComponent(filterGroup)}`;
@@ -52,16 +45,21 @@ export default function BloodBanks() {
     } catch (e) {
       console.error("Failed to fetch campaigns:", e);
     }
-  };
+  }, [filterGroup, filterStatus]);
 
-  const fetchPendingCampaigns = async () => {
+  const fetchPendingCampaigns = useCallback(async () => {
     try {
       const res = await productApi("/api/blood-banks/campaigns?status=pending");
       setPendingCampaigns(res.data || []);
     } catch (e) {
       console.warn("Failed to fetch pending campaigns:", e);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchCampaigns();
+    if (isAdmin) fetchPendingCampaigns();
+  }, [fetchCampaigns, fetchPendingCampaigns, isAdmin]);
 
   const handleCreate = async (e) => {
     e.preventDefault();

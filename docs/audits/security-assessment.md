@@ -1,0 +1,65 @@
+# MedReach security assessment
+
+Date 20 November 2026. Baseline `938f45b`. This is a defensive code review, dependency assessment and verification of existing controls on synthetic local data.
+
+## Reference standard
+
+- ASVS 5.0.0 was the verification reference. See [OWASP ASVS](https://asvs.owasp.org/).
+- WSTG 4.2 is the published stable guide. The [latest development guide](https://wstg.owasp.org/latest/) is a separate reference. See [OWASP WSTG 4.2](https://wstg.owasp.org/v4.2/).
+- API authorization, authentication and resource consumption were reviewed against the 2023 risk categories. See [OWASP API Security Top 10](https://api-security.owasp.org/).
+- The audit used the guidance for typed inputs, explicit operators, secret handling and scoped database access. See [OWASP NoSQL Security](https://cheatsheetseries.owasp.org/cheatsheets/NoSQL_Security_Cheat_Sheet.html), [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/) and [Express security practices](https://expressjs.com/en/advanced/best-practice-security/).
+- SSDF 1.1 is final. SSDF 1.2 is an initial public draft. See [NIST SSDF publications](https://csrc.nist.gov/Projects/ssdf/publications).
+
+## Findings and changes
+
+| ID | Severity | Code and affected surface | Root cause, impact and correction | Verification and residual risk |
+| --- | --- | --- | --- | --- |
+| SEC-01 | Medium | Variant manifests and `package-lock.json` | Next.js 15.5.28 was within the affected ranges of three dependency advisories. Updated all three to 15.5.29 and retained the existing PostCSS 8.5.28 override. | Compare the baseline and revised `npm audit` reports and the resolved versions in the clean fixture install. The dependency findings do not establish reachability in MedReach. No Next.js major upgrade was needed. [Advisory 1](https://github.com/advisories/GHSA-7qx7-33qx-rqx2), [advisory 2](https://github.com/advisories/GHSA-f3mh-rxg3-f5g2), [advisory 3](https://github.com/advisories/GHSA-pc58-hwjq-p385) |
+| SEC-02 | Medium | `.github/workflows/ci.yml`, `.github/workflows/evaluate.yml` | Action references used mutable major tags. Pinned each official action to a full SHA checked against its upstream release. Retained read-only contents permission and disabled checkout credential persistence. | Parsed both workflows and asserted the ref format and permissions. GitHub runner execution of the changes remains unverified. [GitHub Actions secure use](https://docs.github.com/en/actions/reference/security/secure-use) |
+| SEC-03 | High for test data integrity | `playwright.config.mjs`, `scripts/e2e-seed.mjs`, `tests/e2e/global-setup.mjs` | The fixture reset selected an arbitrary host or general Mongo URI if the database name contained a marker. Seeding now requires an explicit, unauthenticated loopback URI and a MedReach fixture database name before any Playwright web server starts and before the seed script connects. Connection options that can change the target are refused. | The pure target validator tests supported fixtures and rejection of ordinary, remote and authenticated targets without opening a socket. A loopback check cannot detect a manually created tunnel. Disposable MongoDB in a separate network namespace remains the recommended execution arrangement. |
+| SEC-04 | Medium | `.github/workflows/ci.yml` | The MongoDB 6.0 CI fixtures depended on an unsupported release. CI now selects the 8.0 release line for standalone and replica fixtures. | Local isolated validation uses MongoDB 8.0.38. The GitHub service image and tool-copy step still need an observed hosted run. Production runtime version was outside scope. [MongoDB lifecycle](https://www.mongodb.com/legal/support-policy/lifecycles) |
+
+## Controls reviewed
+
+| Area | Evidence and limits |
+| --- | --- |
+| SQL and MongoDB query boundaries | No SQL runtime dependency or SQL data access layer appeared in the reviewed workspace manifests and server configuration. Express rejects ambiguous query shapes and unsafe body keys. Route validators normalize parameters and controllers build explicit Mongoose projections, filters and updates. Reviewed the app middleware and directory, admin, authentication and tracking paths. The standard backend validation suite is the runtime evidence. No bespoke injection or exploit reproduction was performed. |
+| Authentication, privileges and object authorization | Reviewed password/session middleware, shared login limits, conditional MFA and recovery policy, scoped provider memberships and the split between public status and private request details. Existing suites cover all three active roles, cross-organisation denial, password recovery, MFA lockout controls and session revocation. Browser access checks complement direct API assertions. |
+| Browser and API security | Reviewed CORS allowlists, cookie-origin checking, Helmet, frame denial, privacy headers and scoped tracking credentials. Next.js CSP currently applies framing, object, form and base restrictions. Script-source enforcement needs separate rollout evidence with Next.js and maps. The baseline cookie-origin check accepted all requests without Origin. The final local verification below documents the narrower policy. |
+| External integrations and files | Reviewed fixed/configured destination construction, timeout handling, per-route/body limits, provider-file handling, and signature-before-parse ordering for Resend. The audit did not verify all external redirect, document parsing, command execution or template rendering paths dynamically. |
+| Secret handling | Reviewed environment file tracking by path only. Only examples were tracked. Searched reachable Git patch history for private-key headers and several token/key/credential formats. Hits were limited to test fixture locations. The URI pattern in `backend/test/integrityMigration.test.js` was found in a rejection fixture. Its value did not match the limited reserved-host categorization, and it was not tested against a remote service. No real credential was confirmed. Values were omitted. CI logs, deployed bundles and secret-manager values were outside scope. |
+
+No production endpoint, live SMTP provider, external application or real database was used as a testing target. The project did not receive a certification or a complete ASVS control-by-control assessment.
+
+## Final local verification
+
+### SEC-05 · Cookie-authenticated mutations without Origin
+
+The prior guard explicitly accepted missing Origin for every cookie-bearing mutation. This preserved same-origin and non-browser compatibility. The earlier code did not record an author rationale for accepting requests marked as cross-origin by the browser.
+
+The API now requires an allowlisted Origin when Fetch Metadata marks a cookie-bearing mutation as `same-site` or `cross-site`. An explicit Origin always goes through the existing allowlist. Headerless API clients and same-origin requests still pass this guard and must satisfy the route's ordinary authentication, validation and authorization. Rejected requests receive 403 before reaching application routes. This protects the browser-signalled cases without treating a missing Origin as proof of trust.
+
+The defensive middleware regression used a synthetic cookie on `POST /health/live`, which has no write handler. A 404 proves the request passed the middleware to the router. Tests verified 404 for headerless, same-origin and explicitly allowed requests. They verified 403 for originless cross-site and same-site requests, and for an explicitly denied Origin. Scope covers the middleware decision only.
+
+The source defaults to `SameSite=None` in production with a Secure, HttpOnly cookie, so the browser-origin decision matters for cross-site deployments. Requests without either Origin or Fetch Metadata still pass this particular guard. JSON parsing and route validation constrain accepted mutations but do not establish a universal CSRF guarantee. Production validation must establish what the proxy preserves and what cookie settings are in effect before considering stricter defaults or explicit CSRF tokens. Permissions and guest-token validation remain separate gates.
+
+### Runtime evidence and boundaries
+
+| Surface | Endpoint or file under test | Verification |
+| --- | --- | --- |
+| MongoDB reads and query validation | `GET /api/hospitals`, `GET /api/jobs`, `GET /api/alerts`, `GET /api/blood-requests`, `GET /api/diagnostics/requests` | Existing regressions exercise structured query keys, unsupported filters and bounded pagination. These are validation assertions, with direct MongoDB-backed diagnostic coverage. |
+| MongoDB writes | `POST /api/auth/login`, `POST /api/diagnostics/requests`, `PATCH /api/diagnostics/requests/:id/status` | Existing cases cover compound credential types, field tampering before persistence, organisation scope and version conflicts. The input-shape unit suite covers structured body keys, prototype-sensitive keys and traversal bounds. |
+| Aggregation and update construction | `hospitalReadPipeline.js`, `publicResourceRead.js`, `providerReport.js`, `providerAdoption.js`, `inventoryService.js`, `diagnosticRequests.js` | Reviewed application-built pipeline stages, field allowlists, membership filters and version predicates. A separate dynamic test campaign against arbitrary stage or update-operator inputs was outside the verification performed. |
+| User and object access | `GET /api/emergency-requests/:id`, `GET /api/ambulances/bookings/:reference`, `GET /api/tracking/:type/:reference` | Existing browser and API flows compare submitter history, other users' requests and the public status projection. |
+| Provider scope | `GET /api/providers/mine`, `GET /api/providers/:kind/:id/report`, `PATCH /api/admin/resources/:id`, `PATCH /api/ambulances/bookings/:id/status`, diagnostic list and status routes | Existing assigned/unassigned fixtures verify that provider access follows active organisation assignments. |
+| System Admin | `GET /api/admin/users`, `GET /api/admin/provider-approvals` | Direct API role fixtures cover platform user groups, deny ordinary users, and check that credential fields are excluded. Browser workflows cover approval, provider accounts and audit. |
+| Browser and API headers | Frontend `/`, `/login`, `/track`; API `/health/live`, `/api/auth/me` | The expanded Playwright regression reads the actual response headers. Frontend CSP covers framing, object loads, base URLs and form destinations. API CSP also checks default and script source directives. Health and private auth responses check `no-store`. |
+| XSS and file handling | Resume validation and the applicant view under `/hospital/jobs` | Existing fixtures exercise unsafe URL schemes and document types without executing content. Browser checks verify unsafe legacy links are excluded and the allowed PDF link is retained. No bespoke stored, reflected or DOM XSS probe ran. |
+| SSRF, traversal and outbound delivery | `GET /api/routing/hospital/:id`, resume validation, `POST /api/webhooks/resend` and provider adapters | Source review checked configured destinations, typed coordinates, signature-before-parsing order, content restrictions and timeouts. The suite includes local webhook and file-policy regressions. No service-routing SSRF probe, filesystem traversal probe or live integration call ran. |
+| SQL injection | Workspace manifests and runtime persistence | **Not applicable.** The application uses MongoDB through Mongoose and has no SQL data-access layer in the reviewed runtime. |
+
+The 682-test backend suite and all three complete browser projects passed. The final pass relied on the existing defensive suites and added policy and header assertions. See [final test totals](test-and-ci-results.md#final-verification-after-the-sign-in-correction). It did not add or execute bespoke exploit payloads. Local HTTP assertions cannot prove production TLS, proxy rewriting or browser header enforcement on hosted URLs. Earlier limited secret-pattern findings still apply. This pass checked tracked environment filenames and ensured the Gemini error cause retains sanitized metadata only. CI logs, cloud secrets, real database privileges and third-party service settings remain outside the local scope.
+
+### Release follow-up
+
+The release branch adds a direct platform-account policy matrix for anonymous clients and all three active roles. Assigned providers can read their own hospital report. The browser API test verifies that a Provider Admin receives 403 when submitting an approval for that same assigned hospital. The existing staff résumé test now also verifies inert applicant text with angle brackets. The [release verification report](medreach-final-security-and-release-verification.md) records the review scope, local results and GitHub evidence.

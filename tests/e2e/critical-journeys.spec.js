@@ -556,3 +556,20 @@ test("tracking needs only a reference and public results exclude personal detail
   await expect(page.locator("#tracking-token")).toHaveCount(0);
   clean();
 });
+
+test("ordinary bed signup preserves the selected hospital and fits a narrow viewport", async ({ page }) => {
+  const hospital = "111111111111111111111111";
+  const returnPath = `/requests/new?flow=standard&hospital=${hospital}`;
+  await page.route("**/api/hospitals?**", (route) => route.fulfill({
+    json: { data: [{ _id: hospital, name: "Synthetic Hospital", locality: "Mumbai" }], nextPage: null },
+  }));
+  await page.route("**/api/auth/me", (route) => route.fulfill({ status: 401, json: { error: "Sign in required" } }));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(returnPath);
+  await expect(page.getByLabel("Target Hospital")).toHaveValue(hospital);
+  const register = page.getByRole("link", { name: "Register new account" });
+  await expect(register).toHaveAttribute("href", `/register?returnTo=${encodeURIComponent(returnPath)}`);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+  await register.click();
+  await expect(page).toHaveURL(/\/register\?returnTo=/);
+});
